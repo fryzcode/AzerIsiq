@@ -26,4 +26,6 @@ public class DistrictController : ControllerBase
         var region = await _districtService.GetByIdAsync(id);
         return region is not null ? Ok(region) : NotFound();
     }
+    
+    
 }

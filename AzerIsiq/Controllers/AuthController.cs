@@ -15,16 +15,16 @@ namespace AzerIsiq.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
-        private readonly IValidator<RegisterDTO> _registerValidator;
+        private readonly IValidator<RegisterDto> _registerValidator;
 
-        public AuthController(AuthService authService, IValidator<RegisterDTO> registerValidator)
+        public AuthController(AuthService authService, IValidator<RegisterDto> registerValidator)
         {
             _authService = authService;
             _registerValidator = registerValidator;
         }
-
+        
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
             try
             {
@@ -35,16 +35,10 @@ namespace AzerIsiq.Controllers
                     validationResult.AddToModelState(ModelState);
                     return BadRequest(ModelState);
                 }
-                
-                var verificationToken = await _authService.Register(
-                    model.UserName,
-                    model.Email,
-                    model.Password,
-                    model.PasswordConfirmation,
-                    model.Role
-                );
 
-                return Ok(new { Message = "User registered successfully", VerificationToken = verificationToken });
+                var token = await _authService.RegisterAsync(model);
+
+                return Ok(new { Message = "User registered successfully", Token = token });
             }
             catch (Exception ex)
             {
@@ -53,12 +47,12 @@ namespace AzerIsiq.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO model)
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
             try
             {
-                var response = await _authService.Login(model.Email, model.Password);
-                return Ok(response);
+                var response = await _authService.LoginAsync(model);
+                return Ok(new { Message = "User login successfully", response });
             }
             catch (Exception ex)
             {

@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace AzerIsiq.Validators;
 
-public class RegisterUserDtoValidator : AbstractValidator<RegisterDTO>
+public class RegisterUserDtoValidator : AbstractValidator<RegisterDto>
 {
     public RegisterUserDtoValidator()
     {

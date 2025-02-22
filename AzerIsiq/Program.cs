@@ -53,7 +53,13 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IReadOnlyRepository<Region>, RegionRepository>();
 builder.Services.AddScoped<IReadOnlyRepository<District>, DistrictRepository>();
 builder.Services.AddScoped<RegionService>();
-builder.Services.AddScoped<DistrictService>();
+// builder.Services.AddScoped<DistrictService>();
+
+builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<IDistrictRepository, DistrictRepository>(); // Если есть
+
+// Регистрация сервисов
+builder.Services.AddScoped<IRegionService, RegionService>();
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

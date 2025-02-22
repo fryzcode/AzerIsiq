@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  azerisiq:
+    image: ${DOCKER_REGISTRY-}azerisiq
+    build:
+      context: .
+      dockerfile: AzerIsiq/Dockerfile

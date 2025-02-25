@@ -12,6 +12,23 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
     {
         _regionRepository = regionRepository;
     }
+    
+    public async Task<PagedResultDto<RegionDto>> GetRegionAsync(int page, int pageSize)
+    {
+        var pagedRegions = await _regionRepository.GetPagedAsync(page, pageSize);
+        
+        return new PagedResultDto<RegionDto>()
+        {
+            Items = pagedRegions.Items.Select(region => new RegionDto()
+            {
+                Id = region.Id,
+                Name = region.Name,
+            }),
+            TotalCount = pagedRegions.TotalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
 
     public async Task<IEnumerable<DistrictDto>> GetDistrictsByRegionAsync(int regionId)
     {

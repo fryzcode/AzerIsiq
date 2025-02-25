@@ -21,6 +21,13 @@ public class RegionController : ControllerBase
     {
         return Ok(await _regionService.GetAllAsync());
     }
+    
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetRegions([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var result = await _regionService.GetRegionAsync(page, pageSize);
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -33,7 +40,7 @@ public class RegionController : ControllerBase
     public async Task<IActionResult> GetDistrictsByRegion(int id)
     {
         var districts = await _regionService.GetDistrictsByRegionAsync(id);
-        return Ok(districts);
+        return Ok(new { Message = "Success", Districts = districts.Select(d => new { d.Id, d.Name }) });
     }
     
     [HttpGet("{id}/substations")]

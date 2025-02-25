@@ -1,8 +1,32 @@
 version: '3.4'
 
 services:
+  azerisiqdb:
+    image: mcr.microsoft.com/azure-sql-edge
+    container_name: db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "MyStrongPass123"
+    ports:
+      - "1435:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
   azerisiq:
-    image: ${DOCKER_REGISTRY-}azerisiq
+    image: azerisiq
     build:
       context: .
       dockerfile: AzerIsiq/Dockerfile
+    container_name: azerisiq
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=azerisiqdb;Database=AzerIsiqDB;User Id=sa;Password=MyStrongPass123;TrustServerCertificate=True"
+    ports:
+      - "6000:6000"
+    depends_on:
+      - azerisiqdb
+    entrypoint: /entrypoint.sh 
+    command: ["./wait-for-it.sh", "azerisiqdb:1433", "--", "/entrypoint.sh"]
+
+volumes:
+  sqlserver-data:
+    driver: local

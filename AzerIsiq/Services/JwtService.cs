@@ -28,11 +28,11 @@ public class JwtService
             new Claim("UserName", user.UserName)
         };
 
-        claims.AddRange(user.UserRoles.Select(ur => new Claim("Role", ur.Role.RoleName)));
+        claims.AddRange(user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.Role.RoleName)));
 
         var token = new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],
-            audience: jwtSettings["Jwt:Audience"],
+            audience: jwtSettings["Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(30),
             signingCredentials: creds);

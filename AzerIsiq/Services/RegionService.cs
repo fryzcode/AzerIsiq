@@ -33,11 +33,11 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
         
         var substationDtos = substations.Select(Substation => new SubstationDto
         {
-            Id = Substation.Id,
+            // Id = Substation.Id,
             Name = Substation.Name,
             DistrictId = Substation.DistrictId,
         });
-
+        
         return substationDtos;
     }
 }

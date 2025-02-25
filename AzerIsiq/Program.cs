@@ -15,18 +15,16 @@ using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddDbContext<AppDbContext>(options =>
       options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+var keyString = jwtSettings["Key"];
+if (string.IsNullOrEmpty(keyString))
+{
+    throw new Exception("JWT Key is missing in configuration.");
+}
+var key = Encoding.UTF8.GetBytes(keyString);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -43,7 +41,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<AuthService>();
@@ -52,27 +49,33 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IReadOnlyRepository<Region>, RegionRepository>();
 builder.Services.AddScoped<IReadOnlyRepository<District>, DistrictRepository>();
+builder.Services.AddScoped<IGenericRepository<Substation>, SubstationRepository>();
 builder.Services.AddScoped<RegionService>();
-// builder.Services.AddScoped<DistrictService>();
 
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
-builder.Services.AddScoped<IDistrictRepository, DistrictRepository>(); // Если есть
+builder.Services.AddScoped<IDistrictRepository, DistrictRepository>(); 
+builder.Services.AddScoped<ISubstationRepository, SubstationRepository>(); 
 
-// Регистрация сервисов
 builder.Services.AddScoped<IRegionService, RegionService>();
+builder.Services.AddScoped<SubstationService>();
+
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+});
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5297); // Запуск на всех интерфейсах на порту 5000
+    options.ListenAnyIP(5297); 
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

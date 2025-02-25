@@ -1,10 +1,12 @@
 using AzerIsiq.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class RegionController : ControllerBase
 {
     private readonly RegionService _regionService;

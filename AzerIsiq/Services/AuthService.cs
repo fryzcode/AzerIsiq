@@ -9,14 +9,15 @@ public class AuthService
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
     private readonly JwtService _jwtService;
+    private readonly IEmailService _emailService;
 
-    public AuthService(IUserRepository userRepository, IRoleRepository roleRepository, JwtService jwtService)
+    public AuthService(IUserRepository userRepository, IRoleRepository roleRepository, JwtService jwtService, IEmailService emailService)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _jwtService = jwtService;
+        _emailService = emailService;
     }
-
 
     public async Task<string> RegisterAsync(RegisterDto dto)
     {
@@ -47,9 +48,6 @@ public class AuthService
         return token;
     }
 
-
-
-
     public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
     {
         var user = await _userRepository.GetByEmailAsync(dto.Email);
@@ -73,5 +71,46 @@ public class AuthService
             RefreshToken = user.RefreshToken
         };
     }
+    
+    public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto)
+    {
+        var user = await _userRepository.GetByEmailAsync(dto.Email);
+        if (user == null) return false;
+    
+        string resetToken = _jwtService.GenerateResetToken();
+        DateTime tokenExpiry = DateTime.UtcNow.AddHours(1);
+    
+        await _userRepository.UpdateResetTokenAsync(user.Id, resetToken, tokenExpiry);
+    
+        string resetLink = $"http://localhost:5297/api/auth/reset-password?token={resetToken}";
+    
+        string subject = "Password Recovery";
+        string body = $@"
+        <p>Hello, {user.UserName}!</p>
+        <p>You have requested to reset your password.</p>
+        <p>Click the link below to reset it:</p>
+        <p><a href='{resetLink}'>Reset Password</a></p>
+        <p>If you did not request this, please ignore this email.</p>";
+
+        await _emailService.SendEmailAsync(user.Email, subject, body);
+
+        return true;
+    }
+
+    public async Task<bool> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await _userRepository.GetByResetTokenAsync(dto.Token);
+        if (user == null || user.Email != dto.Email)
+        {
+            return false;
+        }
+        
+        string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        
+        await _userRepository.UpdatePasswordAsync(user.Id, newPasswordHash);
+
+        return true;
+    }
+
 }
 

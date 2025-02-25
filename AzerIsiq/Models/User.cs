@@ -10,6 +10,8 @@
         public bool IsEmailVerified { get; set; } = false;
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
+        public string? ResetToken { get; set; }
+        public DateTime? ResetTokenExpiration { get; set; }
         public List<UserRole> UserRoles { get; set; } = new();
     }
 }

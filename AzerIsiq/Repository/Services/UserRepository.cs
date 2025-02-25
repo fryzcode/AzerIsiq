@@ -57,4 +57,33 @@ public class UserRepository : IUserRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+    public async Task UpdateResetTokenAsync(int userId, string resetToken, DateTime expiryTime)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.ResetToken = resetToken;
+            user.ResetTokenExpiration = expiryTime;
+            await _context.SaveChangesAsync();
+        }
+    }
+    
+    public async Task<User?> GetByResetTokenAsync(string token)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.ResetToken == token && u.ResetTokenExpiration > DateTime.UtcNow);
+    }
+
+    public async Task UpdatePasswordAsync(int userId, string newPasswordHash)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.PasswordHash = newPasswordHash;
+            user.ResetToken = null;
+            user.ResetTokenExpiration = null;
+            await _context.SaveChangesAsync();
+        }
+    }
+
 }

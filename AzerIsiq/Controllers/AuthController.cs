@@ -59,5 +59,19 @@ namespace AzerIsiq.Controllers
                 return Unauthorized(new { Error = ex.Message });
             }
         }
+        
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            bool result = await _authService.ForgotPasswordAsync(dto);
+            return result ? Ok(new { Message = "Reset email sent"}) : NotFound(new {Message = "User not found"});
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            bool result = await _authService.ResetPasswordAsync(dto);
+            return result ? Ok(new { Message = "Password has been reset"}) : BadRequest(new { Message = "Invalid or expired token"});
+        }
     }
 }

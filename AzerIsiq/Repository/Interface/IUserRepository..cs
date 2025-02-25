@@ -11,5 +11,9 @@ namespace AzerIsiq.Repository.Interface
         Task AddUserRoleAsync(int userId, int roleId);
         Task UpdateRefreshTokenAsync(int userId, string refreshToken, DateTime expiryTime);
         Task<User?> GetUserWithRolesAsync(int id);
+        Task UpdateResetTokenAsync(int userId, string resetToken, DateTime expiryTime);
+        Task<User?> GetByResetTokenAsync(string token);
+        Task UpdatePasswordAsync(int userId, string newPasswordHash);
+
     }
 }

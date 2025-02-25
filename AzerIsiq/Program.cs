@@ -51,7 +51,7 @@ builder.Services.AddScoped<IReadOnlyRepository<Region>, RegionRepository>();
 builder.Services.AddScoped<IReadOnlyRepository<District>, DistrictRepository>();
 builder.Services.AddScoped<IGenericRepository<Substation>, SubstationRepository>();
 builder.Services.AddScoped<RegionService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IDistrictRepository, DistrictRepository>(); 
 builder.Services.AddScoped<ISubstationRepository, SubstationRepository>(); 

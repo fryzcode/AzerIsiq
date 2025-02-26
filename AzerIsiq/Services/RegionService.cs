@@ -43,7 +43,20 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
 
         return districtDtos;
     }
-    
+
+    public async Task<IEnumerable<SubstationDto>> GetSubstationByDistrictAsync(int regionId)
+    {
+        var substations = await _regionRepository.GetSubstationsByDistrictAsync(regionId);
+
+        var substationDtos = substations.Select(substation => new SubstationDto
+        {
+            Id = substation.Id,
+            Name = substation.Name,
+        });
+
+        return substationDtos;
+    }
+
     public async Task<IEnumerable<SubstationDto>> GetSubstationsByRegionAsync(int regionId)
     {
         var substations = await _regionRepository.GetSubstationsByRegionAsync(regionId);

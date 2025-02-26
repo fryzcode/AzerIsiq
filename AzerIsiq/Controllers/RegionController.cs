@@ -19,7 +19,8 @@ public class RegionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return Ok(await _regionService.GetAllAsync());
+        var regions = await _regionService.GetAllAsync();
+        return Ok(new { Message = "Success", Region = regions.Select(s => new { s.Id, s.Name }) });
     }
     
     [HttpGet("paged")]
@@ -33,7 +34,7 @@ public class RegionController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var region = await _regionService.GetByIdAsync(id);
-        return region is not null ? Ok(region) : NotFound();
+        return region is not null ? Ok(new { Message = "Success", region.Id, region.Name }) : NotFound();
     }
     
     [HttpGet("{id}/districts")]
@@ -43,10 +44,17 @@ public class RegionController : ControllerBase
         return Ok(new { Message = "Success", Districts = districts.Select(d => new { d.Id, d.Name }) });
     }
     
-    [HttpGet("{id}/substations")]
-    public async Task<IActionResult> GetSubstationsByRegion(int id)
+    [HttpGet("district/{id}/substations")]
+    public async Task<IActionResult> GetSubstationsByDistrict(int id)
     {
-        var substations = await _regionService.GetSubstationsByRegionAsync(id);
-        return Ok(substations);
+        var substations = await _regionService.GetSubstationByDistrictAsync(id);
+        return Ok(new { Message = "Success", Districts = substations.Select(s => new { s.Id, s.Name }) });
     }
+    
+    // [HttpGet("{id}/substations")]
+    // public async Task<IActionResult> GetSubstationsByRegion(int id)
+    // {
+    //     var substations = await _regionService.GetSubstationsByRegionAsync(id);
+    //     return Ok(substations);
+    // }
 }

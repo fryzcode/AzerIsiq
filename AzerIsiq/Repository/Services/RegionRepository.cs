@@ -18,6 +18,16 @@ public class RegionRepository : ReadOnlyRepository<Region>, IRegionRepository
     {
         return await _context.Districts.Where(d => d.RegionId == regionId).ToListAsync();
     }
+    
+    public async Task<IEnumerable<Substation>> GetSubstationsByDistrictAsync(int districtId)
+    {
+        return await _context.Substations.Where(s => s.DistrictId == districtId).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Tm>> GetTmsBySubstationAsync(int substationId)
+    {
+        return await _context.Tms.Where(t => t.SubstationId == substationId).ToListAsync();
+    }
 
     public async Task<IEnumerable<Substation>> GetSubstationsByRegionAsync(int regionId)
     {

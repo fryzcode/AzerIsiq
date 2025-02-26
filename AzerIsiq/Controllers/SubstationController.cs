@@ -16,16 +16,33 @@ public class SubstationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] SubstationDto dto)
+    public async Task<IActionResult> Create([FromBody] SubstationDto dto)
     {
         try
         {
             var substation = await _substationService.CreateSubstationAsync(dto);
-            return CreatedAtAction(nameof(Add), new { id = substation.Id }, substation);
+            return Ok( new { Message = "Success", Id = substation.Id, Name = substation.Name });
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Edit(int id, [FromBody] SubstationDto dto)
+    {
+        if (dto == null)
+            return BadRequest("Invalid substation data");
+
+        var updatedSubstation = await _substationService.EditSubstationAsync(id, dto);
+        return Ok(new { Message = "Success", Id = updatedSubstation.Id, Name = updatedSubstation.Name, DistrictId = updatedSubstation.DistrictId });
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _substationService.DeleteSubstationAsync(id);
+        return Ok(new { message = "Substation successfully deleted" });
     }
 }

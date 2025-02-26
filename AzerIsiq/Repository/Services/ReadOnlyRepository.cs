@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AzerIsiq.Data;
 using AzerIsiq.Dtos;
 using AzerIsiq.Repository.Interface;
@@ -31,4 +32,8 @@ public class ReadOnlyRepository<T> : IReadOnlyRepository<T> where T : class
             PageSize = pageSize
         };
     }
+    // public async Task<IEnumerable<T>> FilterAsync(Expression<Func<T, bool>> predicate)
+    // {
+    //     return await _dbSet.Where(predicate).ToListAsync();
+    // }
 }

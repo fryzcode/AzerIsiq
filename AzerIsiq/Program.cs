@@ -58,6 +58,8 @@ builder.Services.AddScoped<ISubstationRepository, SubstationRepository>();
 
 builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<SubstationService>();
+builder.Services.AddScoped<DistrictService>();
+
 
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

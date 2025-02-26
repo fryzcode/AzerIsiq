@@ -4,6 +4,7 @@ using AzerIsiq.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzerIsiq.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250226085121_CreateLogTable")]
+    partial class CreateLogTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,39 +44,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Districts", (string)null);
-                });
-
-            modelBuilder.Entity("AzerIsiq.Models.LogEntry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EntityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LogEntries", (string)null);
+                    b.ToTable("Districts");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.Region", b =>
@@ -90,7 +61,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("Regions");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.Role", b =>
@@ -107,7 +78,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -141,7 +112,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.ToTable("Substations", (string)null);
+                    b.ToTable("Substations");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.Tm", b =>
@@ -163,7 +134,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasIndex("SubstationId");
 
-                    b.ToTable("Tms", (string)null);
+                    b.ToTable("Tms");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.User", b =>
@@ -207,7 +178,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.UserRole", b =>
@@ -222,7 +193,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles", (string)null);
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.District", b =>
@@ -234,15 +205,6 @@ namespace AzerIsiq.Migrations
                         .IsRequired();
 
                     b.Navigation("Region");
-                });
-
-            modelBuilder.Entity("AzerIsiq.Models.LogEntry", b =>
-                {
-                    b.HasOne("AzerIsiq.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.Substation", b =>

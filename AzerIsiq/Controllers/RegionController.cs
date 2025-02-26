@@ -48,7 +48,7 @@ public class RegionController : ControllerBase
     public async Task<IActionResult> GetSubstationsByDistrict(int id)
     {
         var substations = await _regionService.GetSubstationByDistrictAsync(id);
-        return Ok(new { Message = "Success", Districts = substations.Select(s => new { s.Id, s.Name }) });
+        return Ok(new { Message = "Success", Substations = substations.Select(s => new { s.Id, s.Name }) });
     }
     
     // [HttpGet("{id}/substations")]

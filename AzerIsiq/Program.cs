@@ -65,10 +65,13 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IDistrictRepository, DistrictRepository>(); 
 builder.Services.AddScoped<ISubstationRepository, SubstationRepository>(); 
+builder.Services.AddScoped<ILoggerRepository, LoggerRepository>();
 
 builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<SubstationService>();
 builder.Services.AddScoped<DistrictService>();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

@@ -7,15 +7,18 @@ namespace AzerIsiq.Repository.Services;
 
 public class SubstationRepository : GenericRepository<Substation>, ISubstationRepository
 {
-    private readonly AppDbContext _context;
+    private readonly ILoggerRepository _logger;
 
-    public SubstationRepository(AppDbContext context) : base(context)
+    public SubstationRepository(AppDbContext context, ILoggerRepository loggerRepository, IHttpContextAccessor httpContextAccessor)
+        : base(context, loggerRepository, httpContextAccessor)
     {
-        _context = context;
+        _logger = loggerRepository;
     }
 
     public async Task<IEnumerable<Tm>> GetTmsBySubstationAsync(int substationId)
     {
-        return await _context.Tms.Where(t => t.SubstationId == substationId).ToListAsync();
+        var tms = await _context.Tms.Where(t => t.SubstationId == substationId).ToListAsync();
+
+        return tms;
     }
 }

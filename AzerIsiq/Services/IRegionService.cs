@@ -8,4 +8,5 @@ public interface IRegionService
     Task<IEnumerable<SubstationDto>> GetSubstationByDistrictAsync(int regionId);
     Task<IEnumerable<SubstationDto>> GetSubstationsByRegionAsync(int regionId);
     Task<PagedResultDto<RegionDto>> GetRegionAsync(int page, int pageSize);
+    Task<IEnumerable<TmDto>> GetTmsBySubstationAsync(int substationId);
 }

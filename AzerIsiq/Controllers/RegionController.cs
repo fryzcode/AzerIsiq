@@ -51,10 +51,10 @@ public class RegionController : ControllerBase
         return Ok(new { Message = "Success", Substations = substations.Select(s => new { s.Id, s.Name }) });
     }
     
-    // [HttpGet("{id}/substations")]
-    // public async Task<IActionResult> GetSubstationsByRegion(int id)
-    // {
-    //     var substations = await _regionService.GetSubstationsByRegionAsync(id);
-    //     return Ok(substations);
-    // }
+    [HttpGet("district/substation/{id}/tms")]
+    public async Task<IActionResult> GetTmsBySubstation(int id)
+    {
+        var tms = await _regionService.GetTmsBySubstationAsync(id);
+        return Ok(new { Message = "Success", Tms = tms.Select(s => new { s.Id, s.Name }) });
+    }
 }

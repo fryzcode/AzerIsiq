@@ -13,11 +13,7 @@ public class RegionRepository : ReadOnlyRepository<Region>, IRegionRepository
     {
         _context = context;
     }
-
-    // public async Task<IEnumerable<District>> GetDistrictsByRegionAsync(int regionId)
-    // {
-    //     return await FindAsync(d => d.RegionId == regionId);
-    // }
+    
     public async Task<IEnumerable<District>> GetDistrictsByRegionAsync(int regionId)
     {
         return await _context.Districts.Where(d => d.RegionId == regionId).ToListAsync();

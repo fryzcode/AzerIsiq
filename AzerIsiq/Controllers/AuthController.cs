@@ -29,6 +29,8 @@ namespace AzerIsiq.Controllers
             try
             {
                 ValidationResult validationResult = await _registerValidator.ValidateAsync(model);
+                
+                string ipAddress = GetIpAddress();
 
                 if (!validationResult.IsValid)
                 {
@@ -36,7 +38,7 @@ namespace AzerIsiq.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var token = await _authService.RegisterAsync(model);
+                var token = await _authService.RegisterAsync(model, ipAddress);
 
                 return Ok(new { Message = "User registered successfully", Token = token });
             }
@@ -51,7 +53,8 @@ namespace AzerIsiq.Controllers
         {
             try
             {
-                var response = await _authService.LoginAsync(model);
+                string ipAddress = GetIpAddress();
+                var response = await _authService.LoginAsync(model, ipAddress);
                 return Ok(new { Message = "User login successfully", response });
             }
             catch (Exception ex)
@@ -60,6 +63,13 @@ namespace AzerIsiq.Controllers
             }
         }
         
+        [HttpPost("verify")]
+        public async Task<IActionResult> VerifyOtp([FromBody] OtpDto otpDto)
+        {
+            string ipAddress = GetIpAddress();
+            var authResponse = await _authService.VerifyOtpAsync(otpDto.Email, otpDto.OtpCode, ipAddress);
+            return Ok(authResponse);
+        }
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
@@ -72,6 +82,21 @@ namespace AzerIsiq.Controllers
         {
             bool result = await _authService.ResetPasswordAsync(dto);
             return result ? Ok(new { Message = "Password has been reset"}) : BadRequest(new { Message = "Invalid or expired token"});
+        }
+        
+        private string GetIpAddress()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+            {
+                return Request.Headers["X-Forwarded-For"].ToString().Split(',')[0].Trim();
+            }
+            
+            string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+    
+            if (ip == "::1")
+                ip = "127.0.0.1";
+
+            return ip;
         }
     }
 }

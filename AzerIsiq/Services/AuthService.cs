@@ -19,7 +19,7 @@ public class AuthService
         _emailService = emailService;
     }
 
-    public async Task<string> RegisterAsync(RegisterDto dto)
+    public async Task<string> RegisterAsync(RegisterDto dto, string ipAddress)
     {
         if (await _userRepository.ExistsByEmailAsync(dto.Email))
             throw new Exception("User with this email already exists");
@@ -32,7 +32,9 @@ public class AuthService
             Email = dto.Email,
             PhoneNumber = dto.PhoneNumber,
             PasswordHash = hashedPassword,
-            IsEmailVerified = false
+            IsEmailVerified = false,
+            IpAddress = ipAddress,
+            CreatedAt = DateTime.UtcNow
         };
 
         user = await _userRepository.CreateAsync(user);
@@ -48,15 +50,80 @@ public class AuthService
         return token;
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
+    public async Task<AuthResponseDto> LoginAsync(LoginDto dto, string ipAddress)
     {
         var user = await _userRepository.GetByEmailAsync(dto.Email);
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid email or password.");
         
-        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-            throw new Exception("Invalid credentials");
+        if (user.LockoutUntil.HasValue && user.LockoutUntil > DateTime.UtcNow)
+            throw new UnauthorizedAccessException($"Account locked. Try again after 10 minutes.");
+        
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+        
+        if (!isPasswordValid)
+        {
+            user.FailedAttempts++;
 
+            if (user.FailedAttempts >= 3)
+            {
+                user.LockoutUntil = DateTime.UtcNow.AddMinutes(10);
+                // _logger.LogWarning($"User {user.Email} locked out until {user.LockoutUntil}");
+            }
+
+            await _userRepository.UpdateAsync(user);
+            throw new UnauthorizedAccessException("Invalid email or password.");
+        }
+        
+        if (ipAddress != user.IpAddress)
+        {
+            var otp = _jwtService.GenerateOtp();
+            var hashedOtp = _jwtService.HashOtp(otp);
+            
+            user.OtpCode = hashedOtp;
+            user.OtpCodeExpiration = DateTime.UtcNow.AddMinutes(5);
+            
+            await _userRepository.UpdateAsync(user);
+            
+            string subject = "OTP Code";
+            string body = $@"
+                <p>Hello, {user.UserName}!</p>
+                <p>Your OTP code is: {otp}</p>";
+
+            await _emailService.SendEmailAsync(user.Email, subject, body);
+
+            throw new UnauthorizedAccessException("OTP sent to email. Please verify.");
+        }
+        
+        return await GenerateAuthTokens(user);
+    }
+    public async Task<AuthResponseDto> VerifyOtpAsync(string email, string enteredOtp, string ipAddress)
+    {
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user == null || user.OtpCode == null || user.OtpCodeExpiration < DateTime.UtcNow)
+            throw new UnauthorizedAccessException("OTP is invalid or expired.");
+
+        bool isValid = _jwtService.VerifyOtp(enteredOtp, user.OtpCode);
+    
+        if (!isValid)
+            throw new UnauthorizedAccessException("Your OTP code is invalid.");
+
+        user.OtpCode = null;
+        user.OtpCodeExpiration = null;
+        user.IpAddress = ipAddress;
+        await _userRepository.UpdateAsync(user);
+
+        return await GenerateAuthTokens(user);
+    }
+    
+
+    private async Task<AuthResponseDto> GenerateAuthTokens(User user)
+    {
         var token = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
+
+        user.FailedAttempts = 0;
+        user.LockoutUntil = null;
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken, DateTime.UtcNow.AddMinutes(30));
@@ -66,10 +133,10 @@ public class AuthService
             UserName = user.UserName,
             Email = user.Email,
             Token = token,
-            RefreshToken = user.RefreshToken
+            RefreshToken = refreshToken
         };
     }
-    
+
     public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto)
     {
         var user = await _userRepository.GetByEmailAsync(dto.Email);

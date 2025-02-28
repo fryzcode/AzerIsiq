@@ -22,7 +22,7 @@ public class SubstationService
 
     public async Task<Substation> CreateSubstationAsync(SubstationDto dto)
     {
-        await ValidateRegionAndDistrictAsync(dto.RegionId, dto.DistrictId);
+        await ValidateRegionAndDistrictAsync(dto);
 
         var substation = new Substation
         {
@@ -40,7 +40,7 @@ public class SubstationService
         if (substation == null)
             throw new Exception("Substation not found!");
 
-        await ValidateRegionAndDistrictAsync(dto.RegionId, dto.DistrictId);
+        await ValidateRegionAndDistrictAsync(dto);
 
         substation.Name = dto.Name;
         substation.DistrictId = dto.DistrictId;
@@ -59,14 +59,14 @@ public class SubstationService
         return true;
     }
 
-    private async Task ValidateRegionAndDistrictAsync(int regionId, int districtId)
+    private async Task ValidateRegionAndDistrictAsync(SubstationDto dto)
     {
-        var region = await _regionRepository.GetByIdAsync(regionId);
+        var region = await _regionRepository.GetByIdAsync(dto.RegionId);
         if (region == null)
             throw new Exception("Region not found!");
 
-        var district = await _districtRepository.GetByIdAsync(districtId);
-        if (district == null || district.RegionId != regionId)
+        var district = await _districtRepository.GetByIdAsync(dto.DistrictId);
+        if (district == null || district.RegionId != dto.RegionId)
             throw new Exception("District not found or does not belong to the selected region");
     }
     

@@ -16,6 +16,7 @@ namespace AzerIsiq.Data
         public DbSet<District> Districts { get; set; }
         public DbSet<Substation> Substations { get; set; }
         public DbSet<Tm> Tms { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -61,6 +62,16 @@ namespace AzerIsiq.Data
                 .WithMany()
                 .HasForeignKey(le => le.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<OtpCode>()
+                .HasOne(o => o.User)
+                .WithMany(u => u.OtpCodes)
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

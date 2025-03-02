@@ -10,13 +10,14 @@ public class AuthService
     private readonly IRoleRepository _roleRepository;
     private readonly JwtService _jwtService;
     private readonly IEmailService _emailService;
-
-    public AuthService(IUserRepository userRepository, IRoleRepository roleRepository, JwtService jwtService, IEmailService emailService)
+    private readonly OtpService _otpService;
+    public AuthService(IUserRepository userRepository, IRoleRepository roleRepository, JwtService jwtService, IEmailService emailService, OtpService otpService)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _jwtService = jwtService;
         _emailService = emailService;
+        _otpService = otpService;
     }
 
     public async Task<string> RegisterAsync(RegisterDto dto, string ipAddress)
@@ -49,46 +50,59 @@ public class AuthService
 
         return token;
     }
-
     public async Task<AuthResponseDto> LoginAsync(LoginDto dto, string ipAddress)
     {
+        DateTime now = DateTime.UtcNow;
         var user = await _userRepository.GetByEmailAsync(dto.Email);
         if (user == null)
             throw new UnauthorizedAccessException("Invalid email or password.");
         
-        if (user.LockoutUntil.HasValue && user.LockoutUntil > DateTime.UtcNow)
-            throw new UnauthorizedAccessException($"Account locked. Try again after 10 minutes.");
-        
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
-        
+
         if (!isPasswordValid)
         {
-            user.FailedAttempts++;
-
-            if (user.FailedAttempts >= 3)
+            if (user.LastFailedAttempt.HasValue && (now - user.LastFailedAttempt.Value).TotalMinutes >= 5)
             {
-                user.LockoutUntil = DateTime.UtcNow.AddMinutes(10);
-                // _logger.LogWarning($"User {user.Email} locked out until {user.LockoutUntil}");
+                user.FailedAttempts = 1;
+            }
+            else
+            {
+                user.FailedAttempts++;
             }
 
+            user.LastFailedAttempt = now;
             await _userRepository.UpdateAsync(user);
+
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
         
+        if (user.LastFailedAttempt.HasValue && user.FailedAttempts >= 3)
+        {
+            TimeSpan timeSinceLastFail = now - user.LastFailedAttempt.Value;
+
+            if (user.FailedAttempts >= 5 && timeSinceLastFail.TotalMinutes < 30)
+            {
+                throw new UnauthorizedAccessException($"Account locked. Try again after {30 - (int)timeSinceLastFail.TotalMinutes} minutes.");
+            }
+            if (user.FailedAttempts >= 3 && timeSinceLastFail.TotalMinutes < 10)
+            {
+                throw new UnauthorizedAccessException($"Account locked. Try again after {10 - (int)timeSinceLastFail.TotalMinutes} minutes.");
+            }
+        }
+        
+        await _userRepository.UpdateAsync(user);
+        
         if (ipAddress != user.IpAddress)
         {
-            var otp = _jwtService.GenerateOtp();
-            var hashedOtp = _jwtService.HashOtp(otp);
+            if (!await _otpService.CanRequestOtpAsync(user.Id))
+                throw new UnauthorizedAccessException("Too many OTP requests. Try later.");
             
-            user.OtpCode = hashedOtp;
-            user.OtpCodeExpiration = DateTime.UtcNow.AddMinutes(5);
-            
-            await _userRepository.UpdateAsync(user);
+            var otp = await _otpService.GenerateOtpAsync(user.Id);
             
             string subject = "OTP Code";
             string body = $@"
-                <p>Hello, {user.UserName}!</p>
-                <p>Your OTP code is: {otp}</p>";
+            <p>Hello, {user.UserName}!</p>
+            <p>Your OTP code is: <strong>{otp}</strong></p>";
 
             await _emailService.SendEmailAsync(user.Email, subject, body);
 
@@ -100,30 +114,26 @@ public class AuthService
     public async Task<AuthResponseDto> VerifyOtpAsync(string email, string enteredOtp, string ipAddress)
     {
         var user = await _userRepository.GetByEmailAsync(email);
-        if (user == null || user.OtpCode == null || user.OtpCodeExpiration < DateTime.UtcNow)
-            throw new UnauthorizedAccessException("OTP is invalid or expired.");
-
-        bool isValid = _jwtService.VerifyOtp(enteredOtp, user.OtpCode);
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid email.");
     
-        if (!isValid)
-            throw new UnauthorizedAccessException("Your OTP code is invalid.");
-
-        user.OtpCode = null;
-        user.OtpCodeExpiration = null;
+        bool isOtpValid = await _otpService.ValidateOtpAsync(user.Id, enteredOtp);
+    
+        if (!isOtpValid)
+            throw new UnauthorizedAccessException("OTP is invalid or expired.");
+    
         user.IpAddress = ipAddress;
         await _userRepository.UpdateAsync(user);
 
         return await GenerateAuthTokens(user);
     }
-    
-
     private async Task<AuthResponseDto> GenerateAuthTokens(User user)
     {
         var token = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
 
         user.FailedAttempts = 0;
-        user.LockoutUntil = null;
+        user.LastFailedAttempt = null;
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken, DateTime.UtcNow.AddMinutes(30));
@@ -136,7 +146,6 @@ public class AuthService
             RefreshToken = refreshToken
         };
     }
-
     public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto)
     {
         var user = await _userRepository.GetByEmailAsync(dto.Email);
@@ -161,7 +170,6 @@ public class AuthService
 
         return true;
     }
-
     public async Task<bool> ResetPasswordAsync(ResetPasswordDto dto)
     {
         var user = await _userRepository.GetByResetTokenAsync(dto.Token);
@@ -176,6 +184,5 @@ public class AuthService
 
         return true;
     }
-
 }
 

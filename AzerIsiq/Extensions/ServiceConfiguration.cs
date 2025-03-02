@@ -25,6 +25,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<IDistrictRepository, DistrictRepository>();
             services.AddScoped<ISubstationRepository, SubstationRepository>();
             services.AddScoped<ITmRepository, TmRepository>();
+            services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
             
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IRegionService, RegionService>();
@@ -35,6 +36,8 @@ namespace AzerIsiq.Extensions
             services.AddScoped<SubstationService>();
             services.AddScoped<DistrictService>();
             services.AddScoped<TmService>();
+            services.AddScoped<OtpService>();
+
             
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

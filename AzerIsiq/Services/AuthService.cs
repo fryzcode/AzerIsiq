@@ -57,6 +57,20 @@ public class AuthService
         if (user == null)
             throw new UnauthorizedAccessException("Invalid email or password.");
         
+        if (user.LastFailedAttempt.HasValue && user.FailedAttempts >= 3)
+        {
+            TimeSpan timeSinceLastFail = now - user.LastFailedAttempt.Value;
+
+            if (user.FailedAttempts >= 5 && timeSinceLastFail.TotalMinutes < 30)
+            {
+                throw new UnauthorizedAccessException($"Account locked. Try again after {30 - (int)timeSinceLastFail.TotalMinutes} minutes.");
+            }
+            if (user.FailedAttempts >= 3 && timeSinceLastFail.TotalMinutes < 10)
+            {
+                throw new UnauthorizedAccessException($"Account locked. Try again after {10 - (int)timeSinceLastFail.TotalMinutes} minutes.");
+            }
+        }
+        
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
 
         if (!isPasswordValid)
@@ -74,20 +88,6 @@ public class AuthService
             await _userRepository.UpdateAsync(user);
 
             throw new UnauthorizedAccessException("Invalid email or password.");
-        }
-        
-        if (user.LastFailedAttempt.HasValue && user.FailedAttempts >= 3)
-        {
-            TimeSpan timeSinceLastFail = now - user.LastFailedAttempt.Value;
-
-            if (user.FailedAttempts >= 5 && timeSinceLastFail.TotalMinutes < 30)
-            {
-                throw new UnauthorizedAccessException($"Account locked. Try again after {30 - (int)timeSinceLastFail.TotalMinutes} minutes.");
-            }
-            if (user.FailedAttempts >= 3 && timeSinceLastFail.TotalMinutes < 10)
-            {
-                throw new UnauthorizedAccessException($"Account locked. Try again after {10 - (int)timeSinceLastFail.TotalMinutes} minutes.");
-            }
         }
         
         await _userRepository.UpdateAsync(user);
@@ -156,7 +156,7 @@ public class AuthService
     
         await _userRepository.UpdateResetTokenAsync(user.Id, resetToken, tokenExpiry);
     
-        string resetLink = $"http://localhost:5297/api/auth/reset-password?token={resetToken}";
+        string resetLink = $"http://localhost:5297/api/auth/reset-password?t={resetToken}?email={dto.Email}";
     
         string subject = "Password Recovery";
         string body = $@"
@@ -173,9 +173,10 @@ public class AuthService
     public async Task<bool> ResetPasswordAsync(ResetPasswordDto dto)
     {
         var user = await _userRepository.GetByResetTokenAsync(dto.Token);
+        
         if (user == null || user.Email != dto.Email)
         {
-            return false;
+            throw new UnauthorizedAccessException("Invalid email or token.");
         }
         
         string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);

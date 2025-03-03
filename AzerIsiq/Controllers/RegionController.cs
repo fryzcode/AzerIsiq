@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 // [Authorize(Roles = "Admin")]
 public class RegionController : ControllerBase
 {

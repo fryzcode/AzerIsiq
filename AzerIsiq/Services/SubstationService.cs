@@ -9,25 +9,35 @@ public class SubstationService
     private readonly ISubstationRepository _substationRepository;
     private readonly IRegionRepository _regionRepository;
     private readonly IDistrictRepository _districtRepository;
+    private readonly ILocationService _locationService;
 
     public SubstationService(
         ISubstationRepository substationRepository,
         IRegionRepository regionRepository,
-        IDistrictRepository districtRepository)
+        IDistrictRepository districtRepository,
+        ILocationService locationService)
     {
         _substationRepository = substationRepository;
         _regionRepository = regionRepository;
         _districtRepository = districtRepository;
+        _locationService = locationService;
     }
 
     public async Task<Substation> CreateSubstationAsync(SubstationDto dto)
     {
+        var location = await _locationService.CreateLocationAsync(
+            dto.Latitude, 
+            dto.Longitude, 
+            dto.Address
+        );
+        
         await ValidateRegionAndDistrictAsync(dto);
 
         var substation = new Substation
         {
             Name = dto.Name,
-            DistrictId = dto.DistrictId
+            DistrictId = dto.DistrictId,
+            LocationId = location.Id
         };
 
         await _substationRepository.CreateAsync(substation);

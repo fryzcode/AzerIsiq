@@ -24,6 +24,11 @@ public class TmService
         _districtRepository = districtRepository;
         _tmRepository = tmRepository;
     }
+
+    public async Task<Tm> GetTmByIdAsync(int id)
+    {
+        return await _tmRepository.GetByIdAsync(id);
+    }
     public async Task<PagedResultDto<TmDto>> GetTmAsync(int page, int pageSize)
     {
         var pagedTms = await _tmRepository.GetPagedAsync(page, pageSize);

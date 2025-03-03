@@ -20,15 +20,18 @@ namespace AzerIsiq.Extensions
             services.AddScoped<IReadOnlyRepository<District>, DistrictRepository>();
             services.AddScoped<IGenericRepository<Substation>, SubstationRepository>();
             services.AddScoped<IGenericRepository<Tm>, TmRepository>();
+            services.AddScoped<IGenericRepository<Location>, LocationRepository>();
             services.AddScoped<ILoggerRepository, LoggerRepository>();
             services.AddScoped<IRegionRepository, RegionRepository>();
             services.AddScoped<IDistrictRepository, DistrictRepository>();
             services.AddScoped<ISubstationRepository, SubstationRepository>();
             services.AddScoped<ITmRepository, TmRepository>();
             services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
             
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IRegionService, RegionService>();
+            services.AddScoped<ILocationService, LocationService>();
 
             services.AddScoped<AuthService>();
             services.AddScoped<JwtService>();

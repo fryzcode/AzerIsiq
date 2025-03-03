@@ -15,9 +15,11 @@ public class OtpService
 
     public async Task<string> GenerateOtpAsync(int userId)
     {
+        await _otpCodeRepository.DeleteExpiredOtpsByUserAsync(userId);
+
         if (!await CanRequestOtpAsync(userId))
             throw new UnauthorizedAccessException("OTP request limit reached for today.");
-
+        
         var rawOtp = new Random().Next(100000, 999999).ToString();
         var hashedOtp = BCrypt.Net.BCrypt.HashPassword(rawOtp);
 

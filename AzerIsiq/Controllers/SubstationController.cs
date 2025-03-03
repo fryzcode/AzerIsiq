@@ -21,7 +21,7 @@ public class SubstationController : ControllerBase
         try
         {
             var substation = await _substationService.CreateSubstationAsync(dto);
-            return Ok( new { Message = "Success", Id = substation.Id, Name = substation.Name });
+            return Ok( new { Message = "Success", Id = substation.Id, Name = substation.Name, Location = substation.Location });
         }
         catch (Exception ex)
         {

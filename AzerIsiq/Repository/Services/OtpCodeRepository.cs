@@ -34,4 +34,17 @@ public class OtpCodeRepository : GenericRepository<OtpCode>, IOtpCodeRepository
         await _context.OtpCodes.AddAsync(otp);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task DeleteExpiredOtpsByUserAsync(int userId)
+    {
+        var expiredOtps = await _context.OtpCodes
+            .Where(o => o.UserId == userId && o.Expiration < DateTime.UtcNow)
+            .ToListAsync();
+
+        if (expiredOtps.Any())
+        {
+            _context.OtpCodes.RemoveRange(expiredOtps);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

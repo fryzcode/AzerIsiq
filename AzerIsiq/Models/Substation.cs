@@ -7,4 +7,7 @@ public class Substation
     public int DistrictId { get; set; }
     public District District { get; set; } = null!;
     public ICollection<Tm> Tms { get; set; } = new List<Tm>();
+    
+    public int? LocationId { get; set; }
+    public Location? Location { get; set; }
 }

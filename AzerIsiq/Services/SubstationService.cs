@@ -48,7 +48,6 @@ public class SubstationService
         await _substationRepository.CreateAsync(substation);
         return substation;
     }
-    
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
     {
         var substation = await _substationRepository.GetByIdAsync(id);
@@ -75,8 +74,6 @@ public class SubstationService
         await _substationRepository.UpdateAsync(substation);
         return substation;
     }
-
-    
     public async Task<bool> DeleteSubstationAsync(int id)
     {
         var substation = await _substationRepository.GetByIdAsync(id);
@@ -86,7 +83,6 @@ public class SubstationService
         await _substationRepository.DeleteAsync(substation.Id);
         return true;
     }
-
     private async Task ValidateRegionAndDistrictAsync(SubstationDto dto)
     {
         var region = await _regionRepository.GetByIdAsync(dto.RegionId);
@@ -97,5 +93,4 @@ public class SubstationService
         if (district == null || district.RegionId != dto.RegionId)
             throw new Exception("District not found or does not belong to the selected region");
     }
-    
 }

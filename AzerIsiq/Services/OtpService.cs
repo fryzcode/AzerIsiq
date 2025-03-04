@@ -12,7 +12,6 @@ public class OtpService
     {
         _otpCodeRepository = otpCodeRepository;
     }
-
     public async Task<string> GenerateOtpAsync(int userId)
     {
         await _otpCodeRepository.DeleteExpiredOtpsByUserAsync(userId);
@@ -35,7 +34,6 @@ public class OtpService
         await _otpCodeRepository.AddOtpAsync(otp);
         return rawOtp;
     }
-
     public async Task<bool> ValidateOtpAsync(int userId, string enteredOtp)
     {
         var latestOtp = await _otpCodeRepository.GetLatestOtpByUserIdAsync(userId);
@@ -44,7 +42,6 @@ public class OtpService
 
         return BCrypt.Net.BCrypt.Verify(enteredOtp, latestOtp.Code);
     }
-
     public async Task<bool> CanRequestOtpAsync(int userId)
     {
         var requestCount = await _otpCodeRepository.GetOtpRequestCountAsync(userId);

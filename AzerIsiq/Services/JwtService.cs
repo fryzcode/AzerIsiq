@@ -50,24 +50,4 @@ public class JwtService
     {
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
     }
-    
-    public string GenerateOtp(int length = 6)
-    {
-        return new Random().Next(100000, 999999).ToString();
-    }
-
-    public string HashOtp(string otp)
-    {
-        using (SHA256 sha256 = SHA256.Create())
-        {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(otp));
-            return Convert.ToBase64String(hashBytes);
-        }
-    }
-    
-    public bool VerifyOtp(string enteredOtp, string storedHash)
-    {
-        string hashedOtp = HashOtp(enteredOtp);
-        return hashedOtp == storedHash;
-    }
 }

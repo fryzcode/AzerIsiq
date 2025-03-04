@@ -28,6 +28,8 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ITmRepository, TmRepository>();
             services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<IImageRepository, ImageRepository>();
+            services.AddScoped<IImageService, ImageService>();
             
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IRegionService, RegionService>();

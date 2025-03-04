@@ -10,4 +10,5 @@ public class Substation
     
     public int? LocationId { get; set; }
     public Location? Location { get; set; }
+    public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
 }

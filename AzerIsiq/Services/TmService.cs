@@ -45,7 +45,6 @@ public class TmService
             PageSize = pageSize
         };
     }
-
     public async Task<Tm> CreateTmAsync(TmDto dto)
     {
         await ValidateTmDataAsync(dto);
@@ -60,7 +59,6 @@ public class TmService
         
         return tm;
     }
-
     public async Task<Tm> EditTmAsync(int id, TmDto dto)
     {
         await ValidateTmDataAsync(dto);
@@ -76,7 +74,6 @@ public class TmService
         
         return tm;
     }
-
     private async Task ValidateTmDataAsync(TmDto dto)
     {
         var region = await _regionRepository.GetByIdAsync(dto.RegionId)

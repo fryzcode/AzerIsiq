@@ -11,7 +11,6 @@ public class EmailService : IEmailService
     {
         _configuration = configuration;
     }
-
     public async Task SendEmailAsync(string email, string subject, string body)
     {
         try

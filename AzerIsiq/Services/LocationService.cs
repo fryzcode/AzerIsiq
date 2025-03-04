@@ -30,7 +30,6 @@ public class LocationService : ILocationService
         await _locationRepository.CreateAsync(location);
         return location;
     }
-
     public async Task<Location?> GetLocationByCoordinatesAsync(decimal latitude, decimal longitude)
     {
         return await _locationRepository.GetByCoordinatesAsync(latitude, longitude);

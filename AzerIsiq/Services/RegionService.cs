@@ -29,7 +29,6 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
             PageSize = pageSize
         };
     }
-
     public async Task<IEnumerable<DistrictDto>> GetDistrictsByRegionAsync(int regionId)
     {
         var districts = await _regionRepository.GetDistrictsByRegionAsync(regionId);
@@ -43,7 +42,6 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
 
         return districtDtos;
     }
-
     public async Task<IEnumerable<SubstationDto>> GetSubstationByDistrictAsync(int districtId)
     {
         var substations = await _regionRepository.GetSubstationsByDistrictAsync(districtId);
@@ -56,7 +54,6 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
 
         return substationDtos;
     }
-    
     public async Task<IEnumerable<TmDto>> GetTmsBySubstationAsync(int substationId)
     {
         var tms = await _regionRepository.GetTmsBySubstationAsync(substationId);
@@ -69,7 +66,6 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
 
         return tmDtos;
     }
-
     public async Task<IEnumerable<SubstationDto>> GetSubstationsByRegionAsync(int regionId)
     {
         var substations = await _regionRepository.GetSubstationsByRegionAsync(regionId);

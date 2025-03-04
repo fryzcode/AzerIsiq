@@ -40,7 +40,6 @@ namespace AzerIsiq.Extensions
             services.AddScoped<DistrictService>();
             services.AddScoped<TmService>();
             services.AddScoped<OtpService>();
-
             
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

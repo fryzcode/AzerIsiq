@@ -25,11 +25,16 @@ public class SubstationService
 
     public async Task<Substation> CreateSubstationAsync(SubstationDto dto)
     {
-        var location = await _locationService.CreateLocationAsync(
-            dto.Latitude, 
-            dto.Longitude, 
-            dto.Address
-        );
+        Location? location = null;
+
+        if (dto.Longitude != 0 && dto.Latitude != 0)
+        {
+            location = await _locationService.CreateLocationAsync(
+                dto.Latitude, 
+                dto.Longitude, 
+                dto.Address
+            );
+        }
         
         await ValidateRegionAndDistrictAsync(dto);
 
@@ -37,7 +42,7 @@ public class SubstationService
         {
             Name = dto.Name,
             DistrictId = dto.DistrictId,
-            LocationId = location.Id
+            LocationId = location?.Id
         };
 
         await _substationRepository.CreateAsync(substation);
@@ -52,12 +57,25 @@ public class SubstationService
 
         await ValidateRegionAndDistrictAsync(dto);
 
+        Location? location = null;
+
+        if (dto.Longitude != 0 && dto.Latitude != 0)
+        {
+            location = await _locationService.CreateLocationAsync(
+                dto.Latitude, 
+                dto.Longitude, 
+                dto.Address
+            );
+            substation.LocationId = location.Id; 
+        }
+
         substation.Name = dto.Name;
         substation.DistrictId = dto.DistrictId;
 
         await _substationRepository.UpdateAsync(substation);
         return substation;
     }
+
     
     public async Task<bool> DeleteSubstationAsync(int id)
     {

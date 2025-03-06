@@ -4,6 +4,7 @@ using AzerIsiq.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzerIsiq.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306070420_ImageMigraton")]
+    partial class ImageMigraton
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace AzerIsiq.Migrations
                     b.ToTable("Districts");
                 });
 
-            modelBuilder.Entity("AzerIsiq.Models.Image", b =>
+            modelBuilder.Entity("AzerIsiq.Models.ImageEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,7 +77,7 @@ namespace AzerIsiq.Migrations
 
                     b.HasIndex("TmId");
 
-                    b.ToTable("Images");
+                    b.ToTable("ImageEntities");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.Location", b =>
@@ -344,7 +347,7 @@ namespace AzerIsiq.Migrations
                     b.Navigation("Region");
                 });
 
-            modelBuilder.Entity("AzerIsiq.Models.Image", b =>
+            modelBuilder.Entity("AzerIsiq.Models.ImageEntity", b =>
                 {
                     b.HasOne("AzerIsiq.Models.Substation", "Substation")
                         .WithMany("Images")

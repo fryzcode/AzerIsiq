@@ -17,7 +17,7 @@ namespace AzerIsiq.Data
         public DbSet<Substation> Substations { get; set; }
         public DbSet<Tm> Tms { get; set; }
         public DbSet<Location> Locations { get; set; }
-        public DbSet<ImageEntity> ImageEntities { get; set; }
+        public DbSet<Image> Images { get; set; }
         public DbSet<OtpCode> OtpCodes { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
         
@@ -81,13 +81,13 @@ namespace AzerIsiq.Data
                 .HasIndex(u => u.Email)
                 .IsUnique();
             
-            modelBuilder.Entity<ImageEntity>()
+            modelBuilder.Entity<Image>()
                 .HasOne(i => i.Substation)
                 .WithMany(s => s.Images)
                 .HasForeignKey(i => i.SubstationId)
                 .OnDelete(DeleteBehavior.Cascade); 
 
-            modelBuilder.Entity<ImageEntity>()
+            modelBuilder.Entity<Image>()
                 .HasOne(i => i.Tm)
                 .WithMany(t => t.Images)
                 .HasForeignKey(i => i.TmId)

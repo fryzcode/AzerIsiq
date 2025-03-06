@@ -13,4 +13,5 @@ public class SubstationDto
     public decimal Latitude { get; set; }
     public decimal Longitude { get; set; }
     public string? Address { get; set; }
+    public IFormFile Image { get; set; } 
 }

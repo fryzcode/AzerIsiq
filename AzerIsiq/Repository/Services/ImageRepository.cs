@@ -11,24 +11,39 @@ public class ImageRepository : IImageRepository
         _context = context;
     }
 
-    public async Task<ImageEntity> AddAsync(ImageEntity image)
+    public async Task<Image> AddAsync(Image image)
     {
-        _context.ImageEntities.Add(image);
+        _context.Images.Add(image);
         await _context.SaveChangesAsync();
         return image;
     }
 
-    public async Task<ImageEntity?> GetByIdAsync(int id)
+    public async Task<Image> UpdateAsync(Image image)
     {
-        return await _context.ImageEntities.FindAsync(id);
+        var existingImage = await _context.Images.FindAsync(image.Id);
+        if (existingImage == null) return null;
+
+        existingImage.ImageName = image.ImageName;
+        existingImage.ImageData = image.ImageData;
+        existingImage.SubstationId = image.SubstationId;
+        existingImage.TmId = image.TmId;
+
+        _context.Images.Update(existingImage);
+        await _context.SaveChangesAsync();
+        return existingImage;
+    }
+    
+    public async Task<Image?> GetByIdAsync(int id)
+    {
+        return await _context.Images.FindAsync(id);
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var image = await _context.ImageEntities.FindAsync(id);
+        var image = await _context.Images.FindAsync(id);
         if (image == null) return false;
 
-        _context.ImageEntities.Remove(image);
+        _context.Images.Remove(image);
         await _context.SaveChangesAsync();
         return true;
     }

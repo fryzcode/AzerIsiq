@@ -16,7 +16,7 @@ public class SubstationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] SubstationDto dto)
+    public async Task<IActionResult> Create([FromForm] SubstationDto dto)
     {
         try
         {

@@ -156,7 +156,7 @@ public class AuthService
     
         await _userRepository.UpdateResetTokenAsync(user.Id, resetToken, tokenExpiry);
     
-        string resetLink = $"http://localhost:5297/api/auth/reset-password?t={resetToken}?email={dto.Email}";
+        string resetLink = $"http://localhost:3000/reset-password?t={resetToken}&email={dto.Email}";
     
         string subject = "Password Recovery";
         string body = $@"

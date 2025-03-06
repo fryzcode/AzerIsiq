@@ -29,16 +29,17 @@ public class TmService
     {
         return await _tmRepository.GetByIdAsync(id);
     }
-    public async Task<PagedResultDto<TmDto>> GetTmAsync(int page, int pageSize)
+    public async Task<PagedResultDto<TmResponeDto>> GetTmAsync(int page, int pageSize)
     {
         var pagedTms = await _tmRepository.GetPagedAsync(page, pageSize);
         
-        return new PagedResultDto<TmDto>()
+        return new PagedResultDto<TmResponeDto>()
         {
-            Items = pagedTms.Items.Select(tm => new TmDto()
+            Items = pagedTms.Items.Select(tm => new TmResponeDto()
             {
                 Id = tm.Id,
                 Name = tm.Name,
+                SubstationId = tm.SubstationId,
             }),
             TotalCount = pagedTms.TotalCount,
             Page = page,

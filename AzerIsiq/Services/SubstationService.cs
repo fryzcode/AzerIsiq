@@ -10,17 +10,23 @@ public class SubstationService
     private readonly IRegionRepository _regionRepository;
     private readonly IDistrictRepository _districtRepository;
     private readonly ILocationService _locationService;
+    private readonly IImageRepository _imageRepository;
+    private readonly IImageService _imageService;
 
     public SubstationService(
         ISubstationRepository substationRepository,
         IRegionRepository regionRepository,
         IDistrictRepository districtRepository,
-        ILocationService locationService)
+        IImageRepository imageRepository,
+        ILocationService locationService,
+        IImageService imageService)
     {
         _substationRepository = substationRepository;
         _regionRepository = regionRepository;
         _districtRepository = districtRepository;
+        _imageRepository = imageRepository;
         _locationService = locationService;
+        _imageService = imageService;
     }
 
     public async Task<Substation> CreateSubstationAsync(SubstationDto dto)
@@ -35,7 +41,7 @@ public class SubstationService
                 dto.Address
             );
         }
-        
+    
         await ValidateRegionAndDistrictAsync(dto);
 
         var substation = new Substation
@@ -44,9 +50,18 @@ public class SubstationService
             DistrictId = dto.DistrictId,
             LocationId = location?.Id
         };
+    
+        var createdSubstation = await _substationRepository.CreateAsync(substation);
 
-        await _substationRepository.CreateAsync(substation);
-        return substation;
+        if (dto.Image != null)
+        {
+            var image = await _imageService.UploadImageAsync(dto.Image);
+            image.SubstationId = createdSubstation.Id;
+        
+            await _imageService.UpdateSubOrTmImageAsync(image);
+        }
+
+        return createdSubstation;
     }
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
     {

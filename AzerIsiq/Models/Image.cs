@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace AzerIsiq.Models;
 
-public class ImageEntity
+public class Image
 {
     public int Id { get; set; }
     public byte[] ImageData { get; set; } = Array.Empty<byte>();

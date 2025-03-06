@@ -63,6 +63,7 @@ public class SubstationService
 
         return createdSubstation;
     }
+    
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
     {
         var substation = await _substationRepository.GetByIdAsync(id);
@@ -71,15 +72,9 @@ public class SubstationService
 
         await ValidateRegionAndDistrictAsync(dto);
 
-        Location? location = null;
-
         if (dto.Longitude != 0 && dto.Latitude != 0)
         {
-            location = await _locationService.CreateLocationAsync(
-                dto.Latitude, 
-                dto.Longitude, 
-                dto.Address
-            );
+            var location = await _locationService.CreateLocationAsync(dto.Latitude, dto.Longitude, dto.Address);
             substation.LocationId = location.Id; 
         }
 
@@ -87,8 +82,31 @@ public class SubstationService
         substation.DistrictId = dto.DistrictId;
 
         await _substationRepository.UpdateAsync(substation);
+
+        if (dto.Image != null)
+        {
+            var existingImage = await _imageService.GetImageBySubstationIdAsync(substation.Id);
+            if (existingImage != null)
+            {
+                var updateDto = new ImageUpdateDto
+                {
+                    Id = existingImage.Id,
+                    File = dto.Image,
+                    SubstationId = substation.Id
+                };
+                await _imageService.UpdateImageAsync(updateDto);
+            }
+            else
+            {
+                var image = await _imageService.UploadImageAsync(dto.Image);
+                image.SubstationId = substation.Id;
+                await _imageService.UpdateSubOrTmImageAsync(image);
+            }
+        }
+
         return substation;
     }
+
     public async Task<bool> DeleteSubstationAsync(int id)
     {
         var substation = await _substationRepository.GetByIdAsync(id);

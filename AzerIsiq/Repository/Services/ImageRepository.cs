@@ -1,6 +1,7 @@
 using AzerIsiq.Data;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 
 public class ImageRepository : IImageRepository
 {
@@ -46,5 +47,9 @@ public class ImageRepository : IImageRepository
         _context.Images.Remove(image);
         await _context.SaveChangesAsync();
         return true;
+    }
+    public async Task<Image?> GetBySubstationIdAsync(int substationId)
+    {
+        return await _context.Images.FirstOrDefaultAsync(i => i.SubstationId == substationId);
     }
 }

@@ -16,19 +16,21 @@ namespace AzerIsiq.Controllers
     {
         private readonly AuthService _authService;
         private readonly IValidator<RegisterDto> _registerValidator;
+        private readonly IValidator<ResetPasswordDto> _resetPasswordValidator;
 
-        public AuthController(AuthService authService, IValidator<RegisterDto> registerValidator)
+        public AuthController(AuthService authService, IValidator<RegisterDto> registerValidator, IValidator<ResetPasswordDto> resetPasswordValidator)
         {
             _authService = authService;
             _registerValidator = registerValidator;
+            _resetPasswordValidator = resetPasswordValidator;
         }
         
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             try
             {
-                ValidationResult validationResult = await _registerValidator.ValidateAsync(model);
+                ValidationResult validationResult = await _registerValidator.ValidateAsync(dto);
                 
                 string ipAddress = GetIpAddress();
 
@@ -38,7 +40,7 @@ namespace AzerIsiq.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var token = await _authService.RegisterAsync(model, ipAddress);
+                var token = await _authService.RegisterAsync(dto, ipAddress);
 
                 return Ok(new { Message = "User registered successfully", Token = token });
             }
@@ -49,12 +51,12 @@ namespace AzerIsiq.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto model)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             try
             {
                 string ipAddress = GetIpAddress();
-                var response = await _authService.LoginAsync(model, ipAddress);
+                var response = await _authService.LoginAsync(dto, ipAddress);
                 return Ok(new { Message = "User login successfully", response });
             }
             catch (Exception ex)
@@ -64,10 +66,10 @@ namespace AzerIsiq.Controllers
         }
         
         [HttpPost("verify")]
-        public async Task<IActionResult> VerifyOtp([FromBody] OtpDto otpDto)
+        public async Task<IActionResult> VerifyOtp([FromBody] OtpDto dto)
         {
             string ipAddress = GetIpAddress();
-            var authResponse = await _authService.VerifyOtpAsync(otpDto.Email, otpDto.OtpCode, ipAddress);
+            var authResponse = await _authService.VerifyOtpAsync(dto.Email, dto.OtpCode, ipAddress);
             return Ok(authResponse);
         }
         [HttpPost("forgot-password")]
@@ -80,6 +82,14 @@ namespace AzerIsiq.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
+            ValidationResult validationResult = await _resetPasswordValidator.ValidateAsync(dto);
+            
+            if (!validationResult.IsValid)
+            {
+                validationResult.AddToModelState(ModelState);
+                return BadRequest(ModelState);
+            }
+
             bool result = await _authService.ResetPasswordAsync(dto);
             return result ? Ok(new { Message = "Password has been reset"}) : BadRequest(new { Message = "Invalid or expired token"});
         }

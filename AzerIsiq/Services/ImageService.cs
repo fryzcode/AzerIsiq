@@ -28,30 +28,34 @@ public class ImageService : IImageService
 
         return await _imageRepository.AddAsync(image);
     }
-    
-    public async Task<Image> UpdateImageAsync(int id, IFormFile file, int substationId)
+    public async Task<Image> UpdateImageAsync(ImageUpdateDto dto)
     {
-        var existingImage = await _imageRepository.GetByIdAsync(id);
+        var existingImage = await _imageRepository.GetByIdAsync(dto.Id);
         if (existingImage == null)
             throw new FileNotFoundException("Image not found");
 
+        using var memoryStream = new MemoryStream();
+
         using var ms = new MemoryStream();
-        await file.CopyToAsync(ms);
+        await dto.File.CopyToAsync(ms);
 
-        existingImage.ImageName = file.FileName;
+        existingImage.ImageName = dto.File.FileName;
         existingImage.ImageData = ms.ToArray();
-        existingImage.SubstationId = substationId;
 
+        if (dto.SubstationId.HasValue)
+            existingImage.SubstationId = dto.SubstationId.Value;
+
+        if (dto.TmId.HasValue)
+            existingImage.TmId = dto.TmId.Value;
+        
         await _imageRepository.UpdateAsync(existingImage);
         return existingImage;
     }
-
     public async Task<byte[]> GetImageBytesAsync(int id)
     {
         var image = await _imageRepository.GetByIdAsync(id);
         return image?.ImageData ?? Array.Empty<byte>();
     }
-
     public async Task<bool> DeleteImageAsync(int id)
     {
         return await _imageRepository.DeleteAsync(id);
@@ -66,4 +70,9 @@ public class ImageService : IImageService
         existingImage.TmId = image.TmId;
         await _imageRepository.UpdateAsync(existingImage);
     }
+    public async Task<Image?> GetImageBySubstationIdAsync(int substationId)
+    {
+        return await _imageRepository.GetBySubstationIdAsync(substationId);
+    }
+
 }

@@ -8,4 +8,5 @@ public interface IImageRepository
     Task<Image?> UpdateAsync(Image image);
     Task<Image?> GetByIdAsync(int id);
     Task<bool> DeleteAsync(int id);
+    Task<Image?> GetBySubstationIdAsync(int substationId);
 }

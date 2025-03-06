@@ -5,8 +5,9 @@ namespace AzerIsiq.Services;
 public interface IImageService
 {
     Task<Image> UploadImageAsync(IFormFile file);
-    Task<Image> UpdateImageAsync(int id, IFormFile file, int substationId);
+    Task<Image> UpdateImageAsync(ImageUpdateDto dto);
     Task<byte[]> GetImageBytesAsync(int id);
     Task<bool> DeleteImageAsync(int id);
     Task UpdateSubOrTmImageAsync(Image image);
+    Task<Image?> GetImageBySubstationIdAsync(int substationId);
 }

@@ -4,7 +4,7 @@ using AzerIsiq.Repository.Interface;
 
 namespace AzerIsiq.Services;
 
-public class SubstationService
+public class SubstationService : ISubstationService
 {
     private readonly ISubstationRepository _substationRepository;
     private readonly IRegionRepository _regionRepository;
@@ -33,7 +33,7 @@ public class SubstationService
     {
         Location? location = null;
 
-        if (dto.Longitude != 0 && dto.Latitude != 0)
+        if (!string.IsNullOrEmpty(dto.Longitude) && !string.IsNullOrEmpty(dto.Latitude))
         {
             location = await _locationService.CreateLocationAsync(
                 dto.Latitude, 
@@ -41,7 +41,7 @@ public class SubstationService
                 dto.Address
             );
         }
-    
+        
         await ValidateRegionAndDistrictAsync(dto);
 
         var substation = new Substation
@@ -70,17 +70,23 @@ public class SubstationService
         if (substation == null)
             throw new Exception("Substation not found!");
 
-        await ValidateRegionAndDistrictAsync(dto);
-
-        if (dto.Longitude != 0 && dto.Latitude != 0)
+        if (dto.RegionId > 0 && dto.DistrictId > 0)
         {
-            var location = await _locationService.CreateLocationAsync(dto.Latitude, dto.Longitude, dto.Address);
-            substation.LocationId = location.Id; 
+            await ValidateRegionAndDistrictAsync(dto);
         }
 
-        substation.Name = dto.Name;
-        substation.DistrictId = dto.DistrictId;
+        if (!string.IsNullOrEmpty(dto.Longitude) && !string.IsNullOrEmpty(dto.Latitude))
+        {
+            var location = await _locationService.CreateLocationAsync(dto.Latitude, dto.Longitude, dto.Address);
+            substation.LocationId = location.Id;
+        }
 
+        if (!string.IsNullOrEmpty(dto.Name))
+            substation.Name = dto.Name;
+
+        if (dto.DistrictId > 0)
+            substation.DistrictId = dto.DistrictId;
+        
         await _substationRepository.UpdateAsync(substation);
 
         if (dto.Image != null)
@@ -116,7 +122,7 @@ public class SubstationService
         await _substationRepository.DeleteAsync(substation.Id);
         return true;
     }
-    private async Task ValidateRegionAndDistrictAsync(SubstationDto dto)
+    public async Task ValidateRegionAndDistrictAsync(SubstationDto dto)
     {
         var region = await _regionRepository.GetByIdAsync(dto.RegionId);
         if (region == null)

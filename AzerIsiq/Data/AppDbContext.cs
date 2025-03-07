@@ -92,6 +92,14 @@ namespace AzerIsiq.Data
                 .WithMany(t => t.Images)
                 .HasForeignKey(i => i.TmId)
                 .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<Location>()
+                .Property(l => l.Latitude)
+                .HasColumnType("decimal(9,6)");
+
+            modelBuilder.Entity<Location>()
+                .Property(l => l.Longitude)
+                .HasColumnType("decimal(9,6)");
         }
     }
 }

@@ -16,6 +16,14 @@ public class ImageService : IImageService
         if (file == null || file.Length == 0)
             throw new ArgumentException("Invalid file");
 
+        const long maxFileSize = 5 * 1024 * 1024;
+        if (file.Length > maxFileSize)
+            throw new ArgumentException("File size exceeds the 5MB limit");
+
+        var allowedMimeTypes = new HashSet<string> { "image/jpeg", "image/png", "image/jpg" };
+        if (!allowedMimeTypes.Contains(file.ContentType))
+            throw new ArgumentException("Only JPEG and PNG formats are allowed");
+
         using var ms = new MemoryStream();
         await file.CopyToAsync(ms);
         var imageData = ms.ToArray();

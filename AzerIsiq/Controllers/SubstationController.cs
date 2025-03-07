@@ -29,8 +29,8 @@ public class SubstationController : ControllerBase
         }
     }
     
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Edit(int id, [FromBody] SubstationDto dto)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Edit(int id, [FromForm] SubstationDto dto)
     {
         if (dto == null)
             return BadRequest("Invalid substation data");

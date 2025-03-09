@@ -59,7 +59,7 @@ public class TmController : ControllerBase
         }
     }
     
-    [HttpPut("{id}")]
+    [HttpPatch("{id}")]
     public async Task<IActionResult> Edit(int id, [FromBody] TmDto dto)
     {
         if (dto == null)

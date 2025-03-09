@@ -63,7 +63,6 @@ public class SubstationService : ISubstationService
 
         return createdSubstation;
     }
-    
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
     {
         var substation = await _substationRepository.GetByIdAsync(id);
@@ -112,7 +111,6 @@ public class SubstationService : ISubstationService
 
         return substation;
     }
-
     public async Task<bool> DeleteSubstationAsync(int id)
     {
         var substation = await _substationRepository.GetByIdAsync(id);

@@ -1,4 +1,5 @@
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 
@@ -67,7 +68,7 @@ public class SubstationService : ISubstationService
     {
         var substation = await _substationRepository.GetByIdAsync(id);
         if (substation == null)
-            throw new Exception("Substation not found!");
+            throw new NotFoundException($"No districts found for region ID {id}.");
 
         if (dto.RegionId > 0 && dto.DistrictId > 0)
         {
@@ -114,8 +115,9 @@ public class SubstationService : ISubstationService
     public async Task<bool> DeleteSubstationAsync(int id)
     {
         var substation = await _substationRepository.GetByIdAsync(id);
+
         if (substation == null)
-            throw new Exception("Substation not found!");
+            throw new NotFoundException($"No districts found for region ID {id}.");
 
         await _substationRepository.DeleteAsync(substation.Id);
         return true;

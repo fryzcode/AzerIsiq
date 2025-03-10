@@ -1,4 +1,5 @@
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 
@@ -33,6 +34,11 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
     {
         var districts = await _regionRepository.GetDistrictsByRegionAsync(regionId);
         
+        if (districts == null || !districts.Any())
+        {
+            throw new NotFoundException($"No districts found for region ID {regionId}.");
+        }
+        
         var districtDtos = districts.Select(district => new DistrictDto
         {
             Id = district.Id,
@@ -45,6 +51,11 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
     public async Task<IEnumerable<SubstationDto>> GetSubstationByDistrictAsync(int districtId)
     {
         var substations = await _regionRepository.GetSubstationsByDistrictAsync(districtId);
+        
+        if (substations == null || !substations.Any())
+        {
+            throw new NotFoundException($"No districts found for region ID {districtId}.");
+        }
 
         var substationDtos = substations.Select(substation => new SubstationDto
         {
@@ -57,6 +68,11 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
     public async Task<IEnumerable<TmDto>> GetTmsBySubstationAsync(int substationId)
     {
         var tms = await _regionRepository.GetTmsBySubstationAsync(substationId);
+        
+        if (tms == null || !tms.Any())
+        {
+            throw new NotFoundException($"No districts found for region ID {substationId}.");
+        }
 
         var tmDtos = tms.Select(tm => new TmDto()
         {

@@ -3,6 +3,7 @@ using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using System;
 using System.Threading.Tasks;
+using AzerIsiq.Extensions.Exceptions;
 
 namespace AzerIsiq.Services;
 
@@ -30,7 +31,14 @@ public class TmService : ITmService
 
     public async Task<Tm> GetTmByIdAsync(int id)
     {
-        return await _tmRepository.GetByIdAsync(id);
+        var tm = await _tmRepository.GetByIdAsync(id);
+        
+        if (tm == null)
+        {
+            throw new NotFoundException($"No districts found for region ID {id}.");
+        }
+        
+        return tm;
     }
     public async Task<PagedResultDto<TmResponeDto>> GetTmAsync(int page, int pageSize)
     {
@@ -79,7 +87,7 @@ public class TmService : ITmService
     {
         var tm = await _tmRepository.GetByIdAsync(id);
         if (tm == null)
-            throw new Exception("Tm not found");
+            throw new NotFoundException($"No transformator found for ID {id}.");
         
         if (dto.RegionId > 0 && dto.DistrictId > 0 && dto.SubstationId > 0)
         {

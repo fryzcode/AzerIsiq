@@ -34,39 +34,42 @@ public class TmController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var tm = await _tmService.GetTmByIdAsync(id);
-        return tm is not null ? Ok(new {Id = tm.Id, Name = tm.Name}) : NotFound(new {Message = "Tm not found!"});
+        return Ok(new { Id = tm.Id, Name = tm.Name });
     }
     
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] TmDto dto)
     {
-        try
+        ValidationResult validationResult = await _tmDtoValidator.ValidateAsync(dto, options => options.IncludeRuleSets("Create"));
+        
+        if (!validationResult.IsValid)
         {
-            ValidationResult validationResult = await _tmDtoValidator.ValidateAsync(dto);
-                
-            if (!validationResult.IsValid)
-            {
-                validationResult.AddToModelState(ModelState);
-                return BadRequest(ModelState);
-            }
-            
-            var tm = await _tmService.CreateTmAsync(dto);
-            return Ok( new { Message = "Success", Id = tm.Id, Name = tm.Name });
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
         }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+    
+        var tm = await _tmService.CreateTmAsync(dto);
+        return Ok(new { Message = "Success", Id = tm.Id, Name = tm.Name });
     }
     
     [HttpPatch("{id}")]
     public async Task<IActionResult> Edit(int id, [FromBody] TmDto dto)
     {
-        if (dto == null)
-            return BadRequest("Invalid tm data");
+        ValidationResult validationResult = await _tmDtoValidator.ValidateAsync(dto, options => options.IncludeRuleSets("Update"));
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         var updatedTm = await _tmService.EditTmAsync(id, dto);
-        return Ok(new { Message = "Success", Id = updatedTm.Id, Name = updatedTm.Name, SubstationId = updatedTm.SubstationId });
+        return Ok(new
+        {
+            Message = "Success",
+            Id = updatedTm.Id,
+            Name = updatedTm.Name,
+            SubstationId = updatedTm.SubstationId
+        });
     }
     
 }

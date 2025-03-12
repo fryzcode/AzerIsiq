@@ -3,7 +3,6 @@ using AzerIsiq.Dtos;
 using AzerIsiq.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 

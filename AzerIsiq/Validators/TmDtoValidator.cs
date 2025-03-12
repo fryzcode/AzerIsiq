@@ -11,8 +11,8 @@ public class TmDtoValidator : AbstractValidator<TmDto>
         RuleSet("Create", () =>
         {
             RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Name is required");
+                .NotEmpty().WithMessage("Name is required.")
+                .Matches(@"^tm-.*$").WithMessage("Transformator Name must start with 'tm-' if it's provided.");
 
             RuleFor(x => x.SubstationId)
                 .GreaterThan(0)
@@ -22,9 +22,9 @@ public class TmDtoValidator : AbstractValidator<TmDto>
         RuleSet("Update", () =>
         {
             RuleFor(x => x.Name)
-                .NotEmpty()
-                .When(x => x.Name != null)
-                .WithMessage("Name is required");
+                .NotEmpty().NotEmpty().WithMessage("Name is required.")
+                .Matches(@"^tm-.*$").WithMessage("Transformator Name must start with 'tm-' if it's provided.")
+                .When(x => x.Name != null);
 
             RuleFor(x => x.SubstationId)
                 .GreaterThan(0)

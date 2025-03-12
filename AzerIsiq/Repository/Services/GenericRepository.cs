@@ -18,6 +18,11 @@ public class GenericRepository<T> : ReadOnlyRepository<T>, IGenericRepository<T>
         _logger = loggerRepository;
         _httpContextAccessor = httpContextAccessor;
     }
+    
+    public IQueryable<T> GetAll()
+    {
+        return _dbSet.AsQueryable();
+    }
 
     public async Task<T> CreateAsync(T entity)
     {

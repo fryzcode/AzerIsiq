@@ -2,6 +2,8 @@ using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using DevExtreme.AspNet.Data;
+using DevExtreme.AspNet.Data.ResponseModel;
 
 namespace AzerIsiq.Services;
 
@@ -29,7 +31,68 @@ public class SubstationService : ISubstationService
         _locationService = locationService;
         _imageService = imageService;
     }
+    public async Task<SubstationGetDto> GetSubstationByIdAsync(int id)
+    {
+        var substation = await _substationRepository.GetByIdWithIncludesAsync(id);
+    
+        if (substation == null)
+        {
+            throw new NotFoundException($"No substation found by ID {id}.");
+        }
 
+        return new SubstationGetDto
+        {
+            Id = substation.Id,
+            Name = substation.Name,
+            District = substation.District == null ? null : new DistrictDto
+            {
+                Id = substation.District.Id,
+                Name = substation.District.Name,
+                RegionId = substation.District.RegionId,
+                Region = substation.District.Region == null ? null : new RegionDto
+                {
+                    Id = substation.District.Region.Id,
+                    Name = substation.District.Region.Name
+                }
+            },
+            Location = substation.Location == null ? null : new LocationDto
+            {
+                Id = substation.Location.Id,
+                Latitude = substation.Location.Latitude,
+                Longitude = substation.Location.Longitude,
+                Address = substation.Location.Address
+            },
+            Images = substation.Images?.Select(img => new ImageDto
+            {
+                Id = img.Id,
+                ImageName = img.ImageName
+            }).ToList()
+        };
+    }
+    
+    public async Task<LoadResult> GetSubstationAsync(DataSourceLoadOptionsBase loadOptions)
+    {
+        var query = _substationRepository.GetAll().AsQueryable();
+
+        return await Task.Run(() => DataSourceLoader.Load(query, loadOptions));
+    }
+    public async Task<PagedResultDto<SubstationResponseDto>> GetSubstationAsync(int page, int pageSize)
+    {
+        var pagedSubs = await _substationRepository.GetPagedAsync(page, pageSize);
+        
+        return new PagedResultDto<SubstationResponseDto>()
+        {
+            Items = pagedSubs.Items.Select(sub => new SubstationResponseDto()
+            {
+                Id = sub.Id,
+                Name = sub.Name,
+                DistrictId = sub.DistrictId,
+            }),
+            TotalCount = pagedSubs.TotalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
     public async Task<Substation> CreateSubstationAsync(SubstationDto dto)
     {
         Location? location = null;
@@ -115,10 +178,23 @@ public class SubstationService : ISubstationService
     public async Task<bool> DeleteSubstationAsync(int id)
     {
         var substation = await _substationRepository.GetByIdAsync(id);
-
+        
         if (substation == null)
-            throw new NotFoundException($"No districts found for region ID {id}.");
+            throw new NotFoundException($"No substation found by ID {id}.");
+        
+        if (substation.LocationId.HasValue)
+        {
+            await _locationService.DeleteLocationAsync(substation.LocationId.Value);
+        }
 
+        if (substation.Images.Any())
+        {
+            foreach (var image in substation.Images)
+            {
+                await _imageService.DeleteImageAsync(image.Id);
+            }
+        }
+        
         await _substationRepository.DeleteAsync(substation.Id);
         return true;
     }

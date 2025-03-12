@@ -35,7 +35,7 @@ public class TmService : ITmService
         
         if (tm == null)
         {
-            throw new NotFoundException($"No districts found for region ID {id}.");
+            throw new NotFoundException($"No tm found by ID {id}.");
         }
         
         return tm;
@@ -110,6 +110,22 @@ public class TmService : ITmService
         
         return tm;
     }
+    public async Task<bool> DeleteTmAsync(int id)
+    {
+        var tm = await _tmRepository.GetByIdAsync(id);
+        
+        if (tm == null)
+            throw new NotFoundException($"No tm found by ID {id}.");
+        
+        if (tm.LocationId.HasValue)
+        {
+            await _locationService.DeleteLocationAsync(tm.LocationId.Value);
+        }
+        
+        await _substationRepository.DeleteAsync(tm.Id);
+        return true;
+    }
+
     public async Task ValidateTmDataAsync(TmDto dto)
     {
         var region = await _regionRepository.GetByIdAsync(dto.RegionId)

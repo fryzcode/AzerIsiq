@@ -1,4 +1,5 @@
 using System.Globalization;
+using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 
@@ -37,8 +38,20 @@ public class LocationService : ILocationService
         await _locationRepository.CreateAsync(location);
         return location;
     }
-
-
+    public async Task<bool> DeleteLocationAsync(int id)
+    {
+        await _locationRepository.DeleteAsync(id);
+        return true;
+    }
+    public async Task<Location> GetLocationByIdAsync(int id)
+    {
+        var location = await _locationRepository.GetByIdAsync(id);
+        if (location == null)
+        {
+            throw new NotFoundException($"Location not found by ID {id}.");
+        }
+        return location;
+    }
     public async Task<Location?> GetLocationByCoordinatesAsync(decimal latitude, decimal longitude)
     {
         return await _locationRepository.GetByCoordinatesAsync(latitude, longitude);

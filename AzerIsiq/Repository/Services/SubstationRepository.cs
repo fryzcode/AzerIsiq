@@ -8,7 +8,6 @@ namespace AzerIsiq.Repository.Services;
 public class SubstationRepository : GenericRepository<Substation>, ISubstationRepository
 {
     private readonly ILoggerRepository _logger;
-
     public SubstationRepository(AppDbContext context, ILoggerRepository loggerRepository, IHttpContextAccessor httpContextAccessor)
         : base(context, loggerRepository, httpContextAccessor)
     {
@@ -21,4 +20,16 @@ public class SubstationRepository : GenericRepository<Substation>, ISubstationRe
 
         return tms;
     }
+    
+    public async Task<Substation?> GetByIdWithIncludesAsync(int id)
+    {
+        return await _context.Substations
+            .Include(s => s.District)
+            .ThenInclude(d => d.Region)
+            .Include(s => s.Location)
+            .Include(s => s.Images)
+            .FirstOrDefaultAsync(s => s.Id == id);
+    }
+
+    
 }

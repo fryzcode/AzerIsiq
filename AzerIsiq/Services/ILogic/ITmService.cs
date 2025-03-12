@@ -9,5 +9,6 @@ public interface ITmService
     Task<PagedResultDto<TmResponeDto>> GetTmAsync(int page, int pageSize);
     Task<Tm> CreateTmAsync(TmDto dto);
     Task<Tm> EditTmAsync(int id, TmDto dto);
+    Task<bool> DeleteTmAsync(int id);
     Task ValidateTmDataAsync(TmDto dto);
 }

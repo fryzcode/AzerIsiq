@@ -6,7 +6,6 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class ImageController : ControllerBase
 {
     private readonly IImageService _imageService;

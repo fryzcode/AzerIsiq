@@ -19,8 +19,8 @@ public class SubscriberRequestDtoValidator: AbstractValidator<SubscriberRequestD
             .MinimumLength(7).WithMessage("Minimum fin code length is 7.")
             .MaximumLength(7).WithMessage("Maximum fin code length is 7.");
         RuleFor(s => s.PopulationStatus).NotEmpty().WithMessage("Population status is required.");
-        RuleFor(s => s.City).NotEmpty().MaximumLength(25).WithMessage("City name is required");
-        RuleFor(s => s.District).NotEmpty().MaximumLength(25).WithMessage("District is required");
+        // RuleFor(s => s.City).NotEmpty().MaximumLength(25).WithMessage("City name is required");
+        // RuleFor(s => s.District).NotEmpty().MaximumLength(25).WithMessage("District is required");
         RuleFor(s => s.Building).NotEmpty().MaximumLength(25).WithMessage("Building is required");
         RuleFor(s => s.Apartment).NotEmpty().MaximumLength(25).WithMessage("Apartment is required");
     }

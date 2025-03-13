@@ -13,7 +13,8 @@ public class Subscriber
     public PopulationStatus PopulationStatus { get; set; }
     public int CityId { get; set; }
     public City? City { get; set; }
-    public string District { get; set; } = null!;
+    public int DistrictId { get; set; }
+    public District? District { get; set; }
     public string Building { get; set; } = null!;
     public string Apartment { get; set; } = null!;
     public string? AtsCode { get; set; }

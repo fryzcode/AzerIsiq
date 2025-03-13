@@ -139,14 +139,16 @@ public class AuthService
         user.LastFailedAttempt = null;
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-        await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken, DateTime.UtcNow.AddMinutes(30));
+        await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken, DateTime.UtcNow.AddMinutes(60));
+        var roles = await _userRepository.GetUserRolesAsync(user.Id);
 
         return new AuthResponseDto
         {
             UserName = user.UserName,
             Email = user.Email,
             Token = token,
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken,
+            Roles = roles
         };
     }
     public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto)
@@ -188,7 +190,6 @@ public class AuthService
 
         return true;
     }
-    
     public int GetCurrentUserId()
     {
         var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);

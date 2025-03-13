@@ -4,6 +4,7 @@ using AzerIsiq.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzerIsiq.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250313081737_AddCitySubscriberCounterTables")]
+    partial class AddCitySubscriberCounterTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -291,8 +294,9 @@ namespace AzerIsiq.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DistrictId")
-                        .HasColumnType("int");
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FinCode")
                         .IsRequired()
@@ -328,8 +332,6 @@ namespace AzerIsiq.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("CounterId");
-
-                    b.HasIndex("DistrictId");
 
                     b.HasIndex("TmId");
 
@@ -533,12 +535,6 @@ namespace AzerIsiq.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AzerIsiq.Models.District", "District")
-                        .WithMany()
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("AzerIsiq.Models.Tm", "Tm")
                         .WithMany()
                         .HasForeignKey("TmId")
@@ -548,8 +544,6 @@ namespace AzerIsiq.Migrations
                     b.Navigation("City");
 
                     b.Navigation("Counter");
-
-                    b.Navigation("District");
 
                     b.Navigation("Tm");
                 });

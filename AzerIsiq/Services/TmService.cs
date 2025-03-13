@@ -4,6 +4,7 @@ using AzerIsiq.Repository.Interface;
 using System;
 using System.Threading.Tasks;
 using AzerIsiq.Extensions.Exceptions;
+using AzerIsiq.Extensions.Repository;
 
 namespace AzerIsiq.Services;
 
@@ -14,19 +15,22 @@ public class TmService : ITmService
     private readonly ISubstationRepository _substationRepository;
     private readonly ITmRepository _tmRepository;
     private readonly ILocationService _locationService;
+    private readonly LoggingService _loggingService;
 
     public TmService(
         ISubstationRepository substationRepository,
         IRegionRepository regionRepository,
         IDistrictRepository districtRepository,
         ITmRepository tmRepository,
-        ILocationService locationService)
+        ILocationService locationService,
+        LoggingService loggingService)
     {
         _substationRepository = substationRepository;
         _regionRepository = regionRepository;
         _districtRepository = districtRepository;
         _tmRepository = tmRepository;
         _locationService = locationService;
+        _loggingService = loggingService;
     }
 
     public async Task<Tm> GetTmByIdAsync(int id)
@@ -81,6 +85,8 @@ public class TmService : ITmService
 
         await _tmRepository.CreateAsync(tm);
         
+        await _loggingService.LogActionAsync("Create", nameof(Subscriber), tm.Id);
+        
         return tm;
     }
     public async Task<Tm> EditTmAsync(int id, TmDto dto)
@@ -108,6 +114,8 @@ public class TmService : ITmService
 
         await _tmRepository.UpdateAsync(tm);
         
+        await _loggingService.LogActionAsync("Edit", nameof(Subscriber), id);
+        
         return tm;
     }
     public async Task<bool> DeleteTmAsync(int id)
@@ -123,9 +131,10 @@ public class TmService : ITmService
         }
         
         await _substationRepository.DeleteAsync(tm.Id);
+        
+        await _loggingService.LogActionAsync("Edit", nameof(Subscriber), id);
         return true;
     }
-
     public async Task ValidateTmDataAsync(TmDto dto)
     {
         var region = await _regionRepository.GetByIdAsync(dto.RegionId)

@@ -73,7 +73,6 @@ public class SubstationService : ISubstationService
             }).ToList()
         };
     }
-    
     public async Task<LoadResult> GetSubstationAsync(DataSourceLoadOptionsBase loadOptions)
     {
         var query = _substationRepository.GetAll().AsQueryable();
@@ -129,6 +128,7 @@ public class SubstationService : ISubstationService
             await _imageService.UpdateSubOrTmImageAsync(image);
         }
 
+        await _loggingService.LogActionAsync("Create", nameof(Subscriber), createdSubstation.Id);
         return createdSubstation;
     }
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
@@ -176,6 +176,8 @@ public class SubstationService : ISubstationService
                 await _imageService.UpdateSubOrTmImageAsync(image);
             }
         }
+        
+        await _loggingService.LogActionAsync("Edit", nameof(Subscriber), id);
 
         return substation;
     }

@@ -7,7 +7,6 @@ namespace AzerIsiq.Data
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
@@ -20,7 +19,10 @@ namespace AzerIsiq.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<OtpCode> OtpCodes { get; set; }
         public DbSet<LogEntry> LogEntries { get; set; }
-        
+        public DbSet<City> Cities { get; set; }
+        public DbSet<Counter> Counters { get; set; }
+        public DbSet<Subscriber> Subscribers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserRole>()
@@ -100,6 +102,31 @@ namespace AzerIsiq.Data
             modelBuilder.Entity<Location>()
                 .Property(l => l.Longitude)
                 .HasColumnType("decimal(9,6)");
+            
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.City)
+                .WithMany()
+                .HasForeignKey(s => s.CityId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.District)
+                .WithMany()
+                .HasForeignKey(s => s.DistrictId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.Counter)
+                .WithMany()
+                .HasForeignKey(s => s.CounterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.Tm)
+                .WithMany()
+                .HasForeignKey(s => s.TmId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
         }
     }
 }

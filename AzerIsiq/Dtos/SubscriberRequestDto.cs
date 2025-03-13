@@ -10,8 +10,8 @@ public class SubscriberRequestDto
     public string PhoneNumber { get; set; } = null!;
     public string FinCode { get; set; } = null!;
     public PopulationStatus PopulationStatus { get; set; }
-    public string City { get; set; } = null!;
-    public string District { get; set; } = null!;
+    public int CityId { get; set; }
+    public int DistrictId { get; set; }
     public string Building { get; set; } = null!;
     public string Apartment { get; set; } = null!;
 }

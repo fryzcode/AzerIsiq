@@ -37,19 +37,21 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<ISubscriberRepository, SubscriberRepository>();
             
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IRegionService, RegionService>();
             services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ISubscriberService, SubscriberService>();
 
-            services.AddScoped<AuthService>();
-            services.AddScoped<JwtService>();
-            services.AddScoped<RegionService>();
             services.AddScoped<SubstationService>();
             services.AddScoped<DistrictService>();
-            services.AddScoped<TmService>();
-            services.AddScoped<OtpService>();
             services.AddScoped<LoggingService>();
+            services.AddScoped<RegionService>();
+            services.AddScoped<AuthService>();
+            services.AddScoped<OtpService>();
+            services.AddScoped<JwtService>();
+            services.AddScoped<TmService>();
             
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

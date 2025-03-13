@@ -29,5 +29,4 @@ public class SubstationRepository : GenericRepository<Substation>, ISubstationRe
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    
 }

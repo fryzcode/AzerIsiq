@@ -58,4 +58,11 @@ public class RegionController : ControllerBase
         var tms = await _regionService.GetTmsBySubstationAsync(id);
         return Ok(new { Message = "Success", Tms = tms.Select(s => new { s.Id, s.Name }) });
     }
+    
+    [HttpGet("{id}/tms")]
+    public async Task<IActionResult> GetTmsByRegion(int id)
+    {
+        var tms = await _regionService.GetTmsByRegionAsync(id);
+        return Ok(tms);
+    }
 }

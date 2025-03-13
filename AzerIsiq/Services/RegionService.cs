@@ -95,4 +95,21 @@ public class RegionService : ReadOnlyService<Region>, IRegionService
         
         return substationDtos;
     }
+    public async Task<IEnumerable<TmDto>> GetTmsByRegionAsync(int regionId)
+    {
+        var tms = await _regionRepository.GetTmsByRegionAsync(regionId);
+    
+        if (tms == null || !tms.Any())
+        {
+            throw new NotFoundException($"No TMs found for region ID {regionId}.");
+        }
+
+        var tmDtos = tms.Select(tm => new TmDto
+        {
+            Id = tm.Id,
+            Name = tm.Name
+        });
+
+        return tmDtos;
+    }
 }

@@ -58,6 +58,14 @@ public class UserRepository : IUserRepository
         _context.UserRoles.Add(new UserRole { UserId = userId, RoleId = roleId });
         await _context.SaveChangesAsync();
     }
+    public async Task<List<string>> GetUserRolesAsync(int userId)
+    {
+        return await _context.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .Select(ur => ur.Role.RoleName)
+            .ToListAsync();
+    }
+
 
     public async Task UpdateRefreshTokenAsync(int userId, string refreshToken, DateTime expiryTime)
     {

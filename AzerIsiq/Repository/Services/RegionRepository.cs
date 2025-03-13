@@ -43,4 +43,13 @@ public class RegionRepository : ReadOnlyRepository<Region>, IRegionRepository
         return substations;
     }
 
+    public async Task<IEnumerable<Tm>> GetTmsByRegionAsync(int regionId)
+    {
+        return await _context.Tms
+            .Include(tm => tm.Substation)
+            .ThenInclude(substation => substation.District)
+            .Where(tm => tm.Substation.District.RegionId == regionId)
+            .ToListAsync();
+    }
+
 }

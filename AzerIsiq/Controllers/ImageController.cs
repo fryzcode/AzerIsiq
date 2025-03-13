@@ -1,10 +1,12 @@
 using AzerIsiq.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ImageController : ControllerBase
 {
     private readonly IImageService _imageService;

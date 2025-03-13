@@ -9,7 +9,7 @@ public class OtpCodeRepository : GenericRepository<OtpCode>, IOtpCodeRepository
 {
     private readonly AppDbContext _context;
 
-    public OtpCodeRepository(AppDbContext context,  ILoggerRepository loggerRepository, IHttpContextAccessor httpContextAccessor) : base(context, loggerRepository, httpContextAccessor)
+    public OtpCodeRepository(AppDbContext context) : base(context)
     {
         _context = context;
     }

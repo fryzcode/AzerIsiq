@@ -9,8 +9,8 @@ public class LocationRepository : GenericRepository<Location>, ILocationReposito
 {
     private readonly AppDbContext _context;
 
-    public LocationRepository(AppDbContext context, ILoggerRepository loggerRepository, IHttpContextAccessor httpContextAccessor)
-        : base(context, loggerRepository, httpContextAccessor)
+    public LocationRepository(AppDbContext context)
+        : base(context)
     {
         _context = context;
     }

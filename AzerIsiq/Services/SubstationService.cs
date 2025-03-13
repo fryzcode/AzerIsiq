@@ -1,5 +1,6 @@
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.Exceptions;
+using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using DevExtreme.AspNet.Data;
@@ -15,6 +16,7 @@ public class SubstationService : ISubstationService
     private readonly ILocationService _locationService;
     private readonly IImageRepository _imageRepository;
     private readonly IImageService _imageService;
+    private readonly LoggingService _loggingService;
 
     public SubstationService(
         ISubstationRepository substationRepository,
@@ -22,7 +24,8 @@ public class SubstationService : ISubstationService
         IDistrictRepository districtRepository,
         IImageRepository imageRepository,
         ILocationService locationService,
-        IImageService imageService)
+        IImageService imageService, 
+        LoggingService loggingService)
     {
         _substationRepository = substationRepository;
         _regionRepository = regionRepository;
@@ -30,6 +33,7 @@ public class SubstationService : ISubstationService
         _imageRepository = imageRepository;
         _locationService = locationService;
         _imageService = imageService;
+        _loggingService = loggingService;
     }
     public async Task<SubstationGetDto> GetSubstationByIdAsync(int id)
     {
@@ -196,6 +200,8 @@ public class SubstationService : ISubstationService
         }
         
         await _substationRepository.DeleteAsync(substation.Id);
+        
+        await _loggingService.LogActionAsync("Delete", nameof(Subscriber), id);
         return true;
     }
     public async Task ValidateRegionAndDistrictAsync(SubstationDto dto)

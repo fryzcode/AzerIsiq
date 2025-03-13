@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
+using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
 
 namespace AzerIsiq.Extensions
@@ -48,6 +49,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<DistrictService>();
             services.AddScoped<TmService>();
             services.AddScoped<OtpService>();
+            services.AddScoped<LoggingService>();
             
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

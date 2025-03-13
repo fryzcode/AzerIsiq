@@ -1,12 +1,15 @@
 using AzerIsiq.Dtos;
 using AzerIsiq.Services;
 using DevExtreme.AspNet.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
+// [Authorize(Roles = "Admin")]
 public class SubstationController : ControllerBase
 {
     private readonly SubstationService _substationService;

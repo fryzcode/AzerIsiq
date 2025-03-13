@@ -3,6 +3,7 @@ using AzerIsiq.Dtos;
 using AzerIsiq.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
@@ -11,6 +12,7 @@ namespace AzerIsiq.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 // [Authorize(Roles = "Admin")]
+[Authorize]
 public class TmController : ControllerBase
 {
     private readonly TmService _tmService;

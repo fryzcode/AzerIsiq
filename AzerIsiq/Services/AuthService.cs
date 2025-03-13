@@ -1,4 +1,5 @@
-﻿using AzerIsiq.Dtos;
+﻿using System.Security.Claims;
+using AzerIsiq.Dtos;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 
@@ -6,18 +7,20 @@ namespace AzerIsiq.Services;
 
 public class AuthService
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
     private readonly JwtService _jwtService;
     private readonly IEmailService _emailService;
     private readonly OtpService _otpService;
-    public AuthService(IUserRepository userRepository, IRoleRepository roleRepository, JwtService jwtService, IEmailService emailService, OtpService otpService)
+    public AuthService(IUserRepository userRepository, IRoleRepository roleRepository, JwtService jwtService, IEmailService emailService, OtpService otpService, IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _jwtService = jwtService;
         _emailService = emailService;
         _otpService = otpService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<string> RegisterAsync(RegisterDto dto, string ipAddress)
@@ -184,6 +187,16 @@ public class AuthService
         await _userRepository.UpdatePasswordAsync(user.Id, newPasswordHash);
 
         return true;
+    }
+    
+    public int GetCurrentUserId()
+    {
+        var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            throw new UnauthorizedAccessException("User is not authorized.");
+        }
+        return int.Parse(userIdClaim.Value);
     }
 }
 

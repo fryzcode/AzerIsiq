@@ -7,11 +7,9 @@ namespace AzerIsiq.Repository.Services;
 
 public class SubstationRepository : GenericRepository<Substation>, ISubstationRepository
 {
-    private readonly ILoggerRepository _logger;
-    public SubstationRepository(AppDbContext context, ILoggerRepository loggerRepository, IHttpContextAccessor httpContextAccessor)
-        : base(context, loggerRepository, httpContextAccessor)
+    public SubstationRepository(AppDbContext context)
+        : base(context)
     {
-        _logger = loggerRepository;
     }
 
     public async Task<IEnumerable<Tm>> GetTmsBySubstationAsync(int substationId)

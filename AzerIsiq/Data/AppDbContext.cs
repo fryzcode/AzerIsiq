@@ -104,10 +104,10 @@ namespace AzerIsiq.Data
                 .HasColumnType("decimal(9,6)");
             
             modelBuilder.Entity<Subscriber>()
-                .HasOne(s => s.City)
+                .HasOne(s => s.Region)
                 .WithMany()
-                .HasForeignKey(s => s.CityId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(s => s.RegionId)
+                .OnDelete(DeleteBehavior.NoAction);
             
             modelBuilder.Entity<Subscriber>()
                 .HasOne(s => s.District)

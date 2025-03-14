@@ -1,8 +1,8 @@
 using AzerIsiq.Extensions.Enum;
 
-namespace AzerIsiq.Models;
+namespace AzerIsiq.Dtos;
 
-public class Subscriber
+public class GetSubscriberDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
@@ -12,17 +12,13 @@ public class Subscriber
     public string FinCode { get; set; } = null!;
     public PopulationStatus PopulationStatus { get; set; }
     public int RegionId { get; set; }
-    public Region? Region { get; set; }
+    public string RegionName { get; set; } = null!;
     public int DistrictId { get; set; }
-    public District? District { get; set; }
+    public string DistrictName { get; set; } = null!;
     public string Building { get; set; } = null!;
     public string Apartment { get; set; } = null!;
+    public int Status { get; set; }
     public string? Ats { get; set; }
+    public DateTime CreatedDate { get; set; }
     public string? SubscriberCode { get; set; }
-    public int? CounterId { get; set; }
-    public Counter? Counter { get; set; }
-    public int? TmId { get; set; }
-    public Tm? Tm { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public int Status { get; set; } = 1;
 }

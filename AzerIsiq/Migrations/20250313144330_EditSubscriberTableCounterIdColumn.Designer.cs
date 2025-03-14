@@ -4,6 +4,7 @@ using AzerIsiq.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzerIsiq.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250313144330_EditSubscriberTableCounterIdColumn")]
+    partial class EditSubscriberTableCounterIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,6 +82,9 @@ namespace AzerIsiq.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -87,6 +93,8 @@ namespace AzerIsiq.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.HasIndex("RegionId");
 
@@ -270,12 +278,15 @@ namespace AzerIsiq.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Ats")
+                    b.Property<string>("AtsCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Building")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("CounterId")
                         .HasColumnType("int");
@@ -305,14 +316,8 @@ namespace AzerIsiq.Migrations
                     b.Property<int>("PopulationStatus")
                         .HasColumnType("int");
 
-                    b.Property<int>("RegionId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("SubscriberCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -323,11 +328,11 @@ namespace AzerIsiq.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CityId");
+
                     b.HasIndex("CounterId");
 
                     b.HasIndex("DistrictId");
-
-                    b.HasIndex("RegionId");
 
                     b.HasIndex("TmId");
 
@@ -465,11 +470,17 @@ namespace AzerIsiq.Migrations
 
             modelBuilder.Entity("AzerIsiq.Models.District", b =>
                 {
+                    b.HasOne("AzerIsiq.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
                     b.HasOne("AzerIsiq.Models.Region", "Region")
                         .WithMany("Districts")
                         .HasForeignKey("RegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("City");
 
                     b.Navigation("Region");
                 });
@@ -513,6 +524,12 @@ namespace AzerIsiq.Migrations
 
             modelBuilder.Entity("AzerIsiq.Models.Subscriber", b =>
                 {
+                    b.HasOne("AzerIsiq.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AzerIsiq.Models.Counter", "Counter")
                         .WithMany()
                         .HasForeignKey("CounterId")
@@ -524,22 +541,16 @@ namespace AzerIsiq.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("AzerIsiq.Models.Region", "Region")
-                        .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("AzerIsiq.Models.Tm", "Tm")
                         .WithMany()
                         .HasForeignKey("TmId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.Navigation("City");
+
                     b.Navigation("Counter");
 
                     b.Navigation("District");
-
-                    b.Navigation("Region");
 
                     b.Navigation("Tm");
                 });

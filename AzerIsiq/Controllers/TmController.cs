@@ -12,13 +12,13 @@ namespace AzerIsiq.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 // [Authorize(Roles = "Admin")]
-[Authorize]
+// [Authorize]
 public class TmController : ControllerBase
 {
-    private readonly TmService _tmService;
+    private readonly ITmService _tmService;
     private readonly IValidator<TmDto> _tmDtoValidator;
 
-    public TmController(TmService tmService, IValidator<TmDto> tmDtoValidator)
+    public TmController(ITmService tmService, IValidator<TmDto> tmDtoValidator)
     {
         _tmService = tmService;
         _tmDtoValidator = tmDtoValidator;
@@ -71,6 +71,17 @@ public class TmController : ControllerBase
             Name = updatedTm.Name,
             SubstationId = updatedTm.SubstationId
         });
+    }
+    
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetTmsByFilters(
+        [FromQuery] PagedRequestDto request, 
+        [FromQuery] int? regionId, 
+        [FromQuery] int? districtId, 
+        [FromQuery] int? substationId)
+    {
+        var result = await _tmService.GetTmsByFiltersAsync(request, regionId, districtId, substationId);
+        return Ok(result);
     }
     
 }

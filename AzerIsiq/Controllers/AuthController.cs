@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using AzerIsiq.Dtos;
+using AzerIsiq.Services.ILogic;
 using AzerIsiq.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -14,11 +15,11 @@ namespace AzerIsiq.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly IValidator<RegisterDto> _registerValidator;
         private readonly IValidator<ResetPasswordDto> _resetPasswordValidator;
 
-        public AuthController(AuthService authService, IValidator<RegisterDto> registerValidator, IValidator<ResetPasswordDto> resetPasswordValidator)
+        public AuthController(IAuthService authService, IValidator<RegisterDto> registerValidator, IValidator<ResetPasswordDto> resetPasswordValidator)
         {
             _authService = authService;
             _registerValidator = registerValidator;

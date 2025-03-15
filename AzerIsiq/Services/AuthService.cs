@@ -2,10 +2,11 @@
 using AzerIsiq.Dtos;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Services;
 
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRepository _userRepository;

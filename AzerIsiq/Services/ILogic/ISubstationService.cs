@@ -14,4 +14,5 @@ public interface ISubstationService
     Task<SubstationGetDto> GetSubstationByIdAsync(int id);
     Task ValidateRegionAndDistrictAsync(SubstationDto dto);
     Task<LoadResult> GetSubstationAsync(DataSourceLoadOptionsBase loadOptions);
+    Task<PagedResultDto<SubstationDto>> GetSubstationByDistrictAsync(PagedRequestDto request, int districtId);
 }

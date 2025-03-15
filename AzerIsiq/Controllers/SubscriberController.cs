@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AzerIsiq.Dtos;
 using AzerIsiq.Services;
+using AzerIsiq.Services.ILogic;
 using AzerIsiq.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;

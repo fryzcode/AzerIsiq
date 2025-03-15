@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Extensions.Repository;
+using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Services;
 
@@ -43,6 +44,22 @@ public class TmService : ITmService
         }
         
         return tm;
+    }
+    public async Task<PagedResultDto<TmDtoPaged>> GetTmsByFiltersAsync(PagedRequestDto request, int? regionId, int? districtId, int? substationId)
+    {
+        var pagedTms = await _tmRepository.GetTmsByFiltersAsync(regionId, districtId, substationId, request.Page, request.PageSize);
+
+        return new PagedResultDto<TmDtoPaged>
+        {
+            Items = pagedTms.Items.Select(t => new TmDtoPaged
+            {
+                Id = t.Id,
+                Name = t.Name,
+            }).ToList(),
+            TotalCount = pagedTms.TotalCount,
+            Page = request.Page,
+            PageSize = request.PageSize
+        };
     }
     public async Task<PagedResultDto<TmResponeDto>> GetTmAsync(int page, int pageSize)
     {

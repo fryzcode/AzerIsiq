@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using AzerIsiq.Services.ILogic;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Data.ResponseModel;
 
@@ -216,4 +218,30 @@ public class SubstationService : ISubstationService
         if (district == null || district.RegionId != dto.RegionId)
             throw new Exception("District not found or does not belong to the selected region");
     }
+    
+    public async Task<PagedResultDto<SubstationDto>> GetSubstationByDistrictAsync(PagedRequestDto request, int districtId)
+    {
+        Expression<Func<Substation, bool>> filter = sb => sb.DistrictId == districtId;
+
+        if (!string.IsNullOrEmpty(request.Search))
+        {
+            filter = sb => sb.DistrictId == districtId && sb.Name.Contains(request.Search);
+        }
+
+        var pagedSubstations = await _substationRepository.GetPageAsync(request.Page, request.PageSize, filter);
+
+        return new PagedResultDto<SubstationDto>
+        {
+            Items = pagedSubstations.Items.Select(sb => new SubstationDto
+            {
+                Id = sb.Id,
+                Name = sb.Name,
+                DistrictId = sb.DistrictId
+            }).ToList(),
+            TotalCount = pagedSubstations.TotalCount,
+            Page = request.Page,
+            PageSize = request.PageSize
+        };
+    }
+
 }

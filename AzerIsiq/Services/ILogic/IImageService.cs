@@ -1,6 +1,6 @@
 using AzerIsiq.Models;
 
-namespace AzerIsiq.Services;
+namespace AzerIsiq.Services.ILogic;
 
 public interface IImageService
 {

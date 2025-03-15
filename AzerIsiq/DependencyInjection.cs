@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
+using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Extensions
 {
@@ -19,9 +20,9 @@ namespace AzerIsiq.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            // Repository
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
-            
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IReadOnlyRepository<Region>, RegionRepository>();
             services.AddScoped<IReadOnlyRepository<District>, DistrictRepository>();
@@ -36,22 +37,25 @@ namespace AzerIsiq.Extensions
             services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
-            services.AddScoped<IImageService, ImageService>();
             services.AddScoped<ISubscriberRepository, SubscriberRepository>();
             
-            services.AddScoped<IEmailService, EmailService>();
+            // Services
+            services.AddScoped(typeof(IReadOnlyService<>), typeof(ReadOnlyService<>));
+            
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRegionService, RegionService>();
-            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<IDistrictService, DistrictService>();
+            services.AddScoped<ISubstationService, SubstationService>();
+            services.AddScoped<ITmService, TmService>();
+            
             services.AddScoped<ISubscriberService, SubscriberService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ILocationService, LocationService>();
 
-            services.AddScoped<SubstationService>();
-            services.AddScoped<DistrictService>();
+            services.AddScoped<IImageService, ImageService>();
             services.AddScoped<LoggingService>();
-            services.AddScoped<RegionService>();
-            services.AddScoped<AuthService>();
             services.AddScoped<OtpService>();
             services.AddScoped<JwtService>();
-            services.AddScoped<TmService>();
             
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

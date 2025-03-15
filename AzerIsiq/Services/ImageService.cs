@@ -1,6 +1,6 @@
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
-using AzerIsiq.Services;
+using AzerIsiq.Services.ILogic;
 
 public class ImageService : IImageService
 {

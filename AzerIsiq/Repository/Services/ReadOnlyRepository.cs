@@ -32,4 +32,28 @@ public class ReadOnlyRepository<T> : IReadOnlyRepository<T> where T : class
             PageSize = pageSize
         };
     }
+    public async Task<PagedResultDto<T>> GetPageAsync(int page, int pageSize, Expression<Func<T, bool>>? filter = null)
+    {
+        IQueryable<T> query = _dbSet;
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        int totalCount = await query.CountAsync();
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResultDto<T>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
 }

@@ -1,4 +1,4 @@
-namespace AzerIsiq.Services;
+namespace AzerIsiq.Services.ILogic;
 
 public interface IEmailService
 {

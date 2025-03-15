@@ -1,4 +1,5 @@
 using AzerIsiq.Services;
+using AzerIsiq.Services.ILogic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +10,9 @@ namespace AzerIsiq.Controllers;
 [Authorize]
 public class DistrictController : ControllerBase
 {
-    private readonly DistrictService _districtService;
+    private readonly IDistrictService _districtService;
 
-    public DistrictController(DistrictService districtService)
+    public DistrictController(IDistrictService districtService)
     {
         _districtService = districtService;
     }
@@ -35,4 +36,5 @@ public class DistrictController : ControllerBase
         var substations = await _districtService.GetSubstationsByDistrictAsync(id);
         return Ok(new { Message = "Success", Districts = substations.Select(s => new { s.Id, s.Name }) });
     }
+    
 }

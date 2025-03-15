@@ -8,13 +8,13 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+// [Authorize]
 // [Authorize(Roles = "Admin")]
 public class SubstationController : ControllerBase
 {
-    private readonly SubstationService _substationService;
+    private readonly ISubstationService _substationService;
 
-    public SubstationController(SubstationService substationService)
+    public SubstationController(ISubstationService substationService)
     {
         _substationService = substationService;
     }
@@ -30,6 +30,13 @@ public class SubstationController : ControllerBase
     public async Task<IActionResult> GetSubstations([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await _substationService.GetSubstationAsync(page, pageSize);
+        return Ok(result);
+    }
+    
+    [HttpGet("by-district/{districtId}")]
+    public async Task<IActionResult> GetSubstationsByDistrict(int districtId, [FromQuery] PagedRequestDto request)
+    {
+        var result = await _substationService.GetSubstationByDistrictAsync(request, districtId);
         return Ok(result);
     }
     

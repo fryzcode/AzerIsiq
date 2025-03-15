@@ -1,15 +1,16 @@
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services;
+using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Extensions.Repository;
 
 public class LoggingService
 {
     private readonly ILoggerRepository _logger;
-    private readonly AuthService _authService;
+    private readonly IAuthService _authService;
 
-    public LoggingService(ILoggerRepository logger, AuthService authService)
+    public LoggingService(ILoggerRepository logger, IAuthService authService)
     {
         _logger = logger;
         _authService = authService;

@@ -1,7 +1,7 @@
 using AzerIsiq.Dtos;
 using AzerIsiq.Models;
 
-namespace AzerIsiq.Services;
+namespace AzerIsiq.Services.ILogic;
 
 public interface ISubscriberService
 {

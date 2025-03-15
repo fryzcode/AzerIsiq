@@ -1,6 +1,7 @@
 using AzerIsiq.Dtos;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Services;
 

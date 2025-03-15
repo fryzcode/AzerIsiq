@@ -1,6 +1,6 @@
 using AzerIsiq.Dtos;
 
-namespace AzerIsiq.Services;
+namespace AzerIsiq.Services.ILogic;
 
 public interface IRegionService
 {

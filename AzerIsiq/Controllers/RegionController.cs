@@ -1,4 +1,5 @@
 using AzerIsiq.Services;
+using AzerIsiq.Services.ILogic;
 using Microsoft.AspNetCore.Mvc;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Data.ResponseModel;
@@ -10,9 +11,9 @@ namespace AzerIsiq.Controllers;
 // [Authorize(Roles = "Admin")]
 public class RegionController : ControllerBase
 {
-    private readonly RegionService _regionService;
+    private readonly IRegionService _regionService;
 
-    public RegionController(RegionService regionService)
+    public RegionController(IRegionService regionService)
     {
         _regionService = regionService;
     }

@@ -75,12 +75,6 @@ public class SubstationService : ISubstationService
             }).ToList()
         };
     }
-    public async Task<LoadResult> GetSubstationAsync(DataSourceLoadOptionsBase loadOptions)
-    {
-        var query = _substationRepository.GetAll().AsQueryable();
-
-        return await Task.Run(() => DataSourceLoader.Load(query, loadOptions));
-    }
     public async Task<PagedResultDto<SubstationResponseDto>> GetSubstationAsync(int page, int pageSize)
     {
         var pagedSubs = await _substationRepository.GetPagedAsync(page, pageSize);

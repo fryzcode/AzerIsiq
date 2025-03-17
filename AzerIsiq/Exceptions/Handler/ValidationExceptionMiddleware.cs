@@ -19,7 +19,7 @@ public class ValidationExceptionMiddleware
         {
             await _next(context);
         }
-        catch (ValidationException ex)  // Ловим ошибки FluentValidation
+        catch (ValidationException ex) 
         {
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             context.Response.ContentType = "application/json";

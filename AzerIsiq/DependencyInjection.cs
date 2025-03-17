@@ -10,9 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
+using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
 using AzerIsiq.Services.ILogic;
+using AzerIsiq.Validators;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Extensions
 {

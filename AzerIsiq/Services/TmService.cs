@@ -99,11 +99,10 @@ public class TmService : ITmService
             SubstationId = dto.SubstationId,
             LocationId = location?.Id
         };
-
+        
         await _tmRepository.CreateAsync(tm);
         
         await _loggingService.LogActionAsync("Create", nameof(Subscriber), tm.Id);
-        
         return tm;
     }
     public async Task<Tm> EditTmAsync(int id, TmDto dto)
@@ -128,11 +127,9 @@ public class TmService : ITmService
 
         if (dto.SubstationId > 0)
             tm.SubstationId = dto.SubstationId;
-
+        
         await _tmRepository.UpdateAsync(tm);
-        
         await _loggingService.LogActionAsync("Edit", nameof(Subscriber), id);
-        
         return tm;
     }
     public async Task<bool> DeleteTmAsync(int id)
@@ -148,8 +145,7 @@ public class TmService : ITmService
         }
         
         await _substationRepository.DeleteAsync(tm.Id);
-        
-        await _loggingService.LogActionAsync("Edit", nameof(Subscriber), id);
+        await _loggingService.LogActionAsync("Delete", nameof(Subscriber), id);
         return true;
     }
     public async Task ValidateTmDataAsync(TmDto dto)

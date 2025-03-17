@@ -26,7 +26,8 @@ public class SubscriberController : ControllerBase
     {
         await _sbDtoValidator.ValidateAndThrowAsync(dto);
         
-        var substation = await _subscriberService.CreateSubscriberRequestAsync(dto);
+        await _subscriberService.CreateSubscriberRequestAsync(dto);
+        
         return Ok( new { Message = "Success" });
     }
     

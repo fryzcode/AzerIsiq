@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using AzerIsiq.Dtos;
 using AzerIsiq.Services;
 using FluentValidation;
@@ -12,13 +13,13 @@ namespace AzerIsiq.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 // [Authorize(Roles = "Admin")]
-// [Authorize]
+[Authorize]
 public class TmController : ControllerBase
 {
     private readonly ITmService _tmService;
     private readonly IValidator<TmDto> _tmDtoValidator;
-
-    public TmController(ITmService tmService, IValidator<TmDto> tmDtoValidator)
+    
+    public TmController(ITmService tmService, IValidator<TmDto> tmDtoValidator, IValidator<TmDto> tmCreateValidator)
     {
         _tmService = tmService;
         _tmDtoValidator = tmDtoValidator;
@@ -41,13 +42,7 @@ public class TmController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] TmDto dto)
     {
-        ValidationResult validationResult = await _tmDtoValidator.ValidateAsync(dto, options => options.IncludeRuleSets("Create"));
-        
-        if (!validationResult.IsValid)
-        {
-            validationResult.AddToModelState(ModelState);
-            return BadRequest(ModelState);
-        }
+        await _tmDtoValidator.ValidateAndThrowAsync(dto);
     
         var tm = await _tmService.CreateTmAsync(dto);
         return Ok(new { Message = "Success", Id = tm.Id, Name = tm.Name });
@@ -56,13 +51,8 @@ public class TmController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> Edit(int id, [FromBody] TmDto dto)
     {
-        ValidationResult validationResult = await _tmDtoValidator.ValidateAsync(dto, options => options.IncludeRuleSets("Update"));
-        if (!validationResult.IsValid)
-        {
-            validationResult.AddToModelState(ModelState);
-            return BadRequest(ModelState);
-        }
-
+        await _tmDtoValidator.ValidateAndThrowAsync(dto);
+        
         var updatedTm = await _tmService.EditTmAsync(id, dto);
         return Ok(new
         {

@@ -8,7 +8,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize]
+[Authorize]
 // [Authorize(Roles = "Admin")]
 public class SubstationController : ControllerBase
 {
@@ -46,13 +46,6 @@ public class SubstationController : ControllerBase
         var sb = await _substationService.GetSubstationByIdAsync(id);
         
         return Ok(sb);
-    }
-    
-    [HttpGet]
-    public async Task<IActionResult> GetSubstations(DataSourceLoadOptionsBase loadOptions)
-    {
-        var result = await _substationService.GetSubstationAsync(loadOptions);
-        return Ok(result);
     }
     
     [HttpPatch("{id}")]

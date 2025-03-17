@@ -35,7 +35,7 @@ public class ExceptionMiddleware
         var statusCode = exception switch
         {
             NotFoundException => (int)HttpStatusCode.NotFound,
-            ValidationException => (int)HttpStatusCode.BadRequest,
+            // ValidationException => (int)HttpStatusCode.BadRequest,
             NotAuthorizedException => (int)HttpStatusCode.Unauthorized,
             _ => (int)HttpStatusCode.InternalServerError
         };

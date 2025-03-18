@@ -9,12 +9,13 @@ public class SubscriberService : ISubscriberService
 {
     private readonly ISubscriberRepository _subscriberRepository;
     private readonly IRegionRepository _regionRepository;
-
-
-    public SubscriberService(ISubscriberRepository subscriberRepository, IRegionRepository regionRepository)
+    private readonly ICounterService _counterService;
+    
+    public SubscriberService(ISubscriberRepository subscriberRepository, IRegionRepository regionRepository, ICounterService counterService)
     {
         _subscriberRepository = subscriberRepository;
         _regionRepository = regionRepository;
+        _counterService = counterService;
     }
     
     public async Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto)
@@ -31,6 +32,8 @@ public class SubscriberService : ISubscriberService
             PopulationStatus = dto.PopulationStatus,
             RegionId = dto.RegionId,
             DistrictId = dto.DistrictId,
+            TerritoryId = dto.TerritoryId,
+            StreetId = dto.StreetId,
             Building = dto.Building.ToLower(),
             Apartment = dto.Apartment.ToLower(),
             Ats = atsCode
@@ -47,27 +50,43 @@ public class SubscriberService : ISubscriberService
         {
             throw new Exception("Not Found");
         }
-
         var districtId = subscriber.DistrictId.ToString().PadLeft(2, '0');
-        var building = subscriber.Building.ToLower().PadLeft(4, '0');
-        var apartment = subscriber.Apartment.ToLower().PadLeft(4, '0');
+        var territoryId = (subscriber.TerritoryId?.ToString() ?? "00").PadLeft(2, '0');
+        var streetId = (subscriber.StreetId?.ToString() ?? "000").PadLeft(3, '0');
+        var building = (subscriber.Building ?? "0").PadLeft(4, '0');
+        var apartment = (subscriber.Apartment ?? "0").PadLeft(4, '0');
 
-        var sbCode = $"{districtId}08000{building}{apartment}";
+        var sbCode = $"{districtId}{territoryId}{streetId}{building}{apartment}";
     
         Console.WriteLine(sbCode);
     
         subscriber.SubscriberCode = sbCode;
-        subscriber.Status++;
-    
+
+        if (subscriber.Status == 1)
+        {
+            subscriber.Status++;
+        }
+        
         await _subscriberRepository.UpdateAsync(subscriber); 
     
         return subscriber;
     }
 
-    // public async Task<Subscriber> CreateCounterForSubscriberAsync(int id)
-    // {
-    //     
-    // }
+    public async Task<Subscriber> CreateCounterForSubscriberAsync(int id, CounterDto dto)
+    {
+        var subscriber = await _subscriberRepository.GetByIdAsync(id);
+        if (subscriber == null)
+        {
+            throw new Exception("Not Found");
+        }
+
+        var counter = await _counterService.CreateCountersAsync(dto);
+        
+        subscriber.CounterId = counter.Id;
+        await _subscriberRepository.UpdateAsync(subscriber); 
+        return subscriber;
+    }
+
     public async Task<PagedResultDto<GetSubscriberDto>> GetSubscribersAsync(int page, int pageSize)
     {
         var (subscribers, totalCount) = await _subscriberRepository.GetSubscribersAsync(page, pageSize);
@@ -85,10 +104,15 @@ public class SubscriberService : ISubscriberService
             RegionName = s.Region?.Name ?? "N/A", 
             DistrictId = s.DistrictId,
             DistrictName = s.District?.Name ?? "N/A", 
+            TerritoryId = s.TerritoryId ?? 0,
+            TerriotoryName = s.Territory?.Name ?? "N/A",
+            StreetId = s.StreetId ?? 0,
+            StreetName = s.Street?.Name ?? "N/A",
             Building = s.Building,
             Apartment = s.Apartment,
             Status = s.Status,
             Ats = s.Ats,
+            SubscriberCode = s.SubscriberCode,
             CreatedDate = s.CreatedAt.ToLocalTime()
         }).ToList();
 

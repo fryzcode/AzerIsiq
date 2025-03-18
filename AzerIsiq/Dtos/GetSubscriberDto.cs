@@ -15,6 +15,10 @@ public class GetSubscriberDto
     public string RegionName { get; set; } = null!;
     public int DistrictId { get; set; }
     public string DistrictName { get; set; } = null!;
+    public int TerritoryId { get; set; }
+    public string TerriotoryName { get; set; } = null!;
+    public int StreetId { get; set; }
+    public string StreetName { get; set; } = null!;
     public string Building { get; set; } = null!;
     public string Apartment { get; set; } = null!;
     public int Status { get; set; }

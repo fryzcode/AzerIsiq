@@ -12,6 +12,8 @@ public class SubscriberRequestDto
     public PopulationStatus PopulationStatus { get; set; }
     public int RegionId { get; set; }
     public int DistrictId { get; set; }
+    public int TerritoryId { get; set; }
+    public int StreetId { get; set; }
     public string Building { get; set; } = null!;
     public string Apartment { get; set; } = null!;
 }

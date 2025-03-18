@@ -39,6 +39,14 @@ public class SubscriberController : ControllerBase
         return Ok(new { Message = "Success" });
     }
     
+    [HttpPost("sb-counter")]
+    public async Task<IActionResult> CreateSbCounter(int id, CounterDto dto)
+    {
+        await _subscriberService.CreateCounterForSubscriberAsync(id, dto);
+    
+        return Ok(new { Message = "Success" });
+    }
+    
     [HttpGet]
     public async Task<IActionResult> GetPagedSubscriber(int page = 1, int pageSize = 10)
     {

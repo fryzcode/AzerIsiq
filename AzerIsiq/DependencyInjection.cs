@@ -41,6 +41,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<ISubscriberRepository, SubscriberRepository>();
+            services.AddScoped<ICounterRepository, CounterRepository>();
             
             // Services
             services.AddScoped(typeof(IReadOnlyService<>), typeof(ReadOnlyService<>));
@@ -54,6 +55,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ISubscriberService, SubscriberService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ICounterService, CounterService>();
 
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<LoggingService>();

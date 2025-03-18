@@ -7,6 +7,6 @@ public interface ISubscriberService
 {
     Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto);
     Task<Subscriber> CreateSubscriberCodeAsync(int id);
-    // Task<Subscriber> CreateCounterForSubscriberAsync(int id);
+    Task<Subscriber> CreateCounterForSubscriberAsync(int id, CounterDto dto);
     Task<PagedResultDto<GetSubscriberDto>> GetSubscribersAsync(int page, int pageSize);
 }

@@ -31,8 +31,8 @@ public class SubscriberService : ISubscriberService
             PopulationStatus = dto.PopulationStatus,
             RegionId = dto.RegionId,
             DistrictId = dto.DistrictId,
-            Building = dto.Building,
-            Apartment = dto.Apartment,
+            Building = dto.Building.ToLower(),
+            Apartment = dto.Apartment.ToLower(),
             Ats = atsCode
         };
         
@@ -40,34 +40,34 @@ public class SubscriberService : ISubscriberService
 
         return result;
     }
-    
-    public async Task<Subscriber> CreateSubscriberAtsAsync(SubscriberRequestDto dto)
+    public async Task<Subscriber> CreateSubscriberCodeAsync(int id)
     {
-        
-        var subscriber = new Subscriber()
+        var subscriber = await _subscriberRepository.GetByIdAsync(id);
+        if (subscriber == null)
         {
-            Name = dto.Name,
-            Surname = dto.Surname,
-            Patronymic = dto.Patronymic,
-            PhoneNumber = dto.PhoneNumber,
-            FinCode = dto.FinCode,
-            PopulationStatus = dto.PopulationStatus,
-            // CityId = dto.CityId,
-            DistrictId = dto.DistrictId,
-            Building = dto.Building,
-            Apartment = dto.Apartment
-        };
-        
-        var result = await _subscriberRepository.CreateAsync(subscriber);
+            throw new Exception("Not Found");
+        }
 
-        return result;
+        var districtId = subscriber.DistrictId.ToString().PadLeft(2, '0');
+        var building = subscriber.Building.ToLower().PadLeft(4, '0');
+        var apartment = subscriber.Apartment.ToLower().PadLeft(4, '0');
+
+        var sbCode = $"{districtId}08000{building}{apartment}";
+    
+        Console.WriteLine(sbCode);
+    
+        subscriber.SubscriberCode = sbCode;
+        subscriber.Status++;
+    
+        await _subscriberRepository.UpdateAsync(subscriber); 
+    
+        return subscriber;
     }
 
-    // public async Task<GetSubscriberDto> GetSubscribersAsync()
+    // public async Task<Subscriber> CreateCounterForSubscriberAsync(int id)
     // {
     //     
     // }
-    
     public async Task<PagedResultDto<GetSubscriberDto>> GetSubscribersAsync(int page, int pageSize)
     {
         var (subscribers, totalCount) = await _subscriberRepository.GetSubscribersAsync(page, pageSize);
@@ -100,26 +100,4 @@ public class SubscriberService : ISubscriberService
             PageSize = pageSize
         };
     }
-    
-    // public async Task<PagedResultDto<GetSubscriberDto>> GetSubscribersAsync(int page, int pageSize)
-    // {
-    //     var pagedSubscribers = await _subscriberRepository.GetPagedAsync(page, pageSize);
-    //     var regionName = await _regionRepository.GetByIdAsync(dto.RegionId);
-    //     var pagedSubscribers
-    //     
-    //     return new PagedResultDto<GetSubscriberDto>()
-    //     {
-    //         Items = pagedSubscribers.Items.Select(subscriber => new GetSubscriberDto()
-    //         {
-    //             Id = subscriber.Id,
-    //             Ats = subscriber.Ats,
-    //             RegionId = subscriber.RegionId,
-    //             RegionName = _regionRepository.GetByIdAsync(subscriber.RegionId).Result.Name,;
-    //             Name = subscriber.Name,
-    //         }),
-    //         TotalCount = pagedSubscribers.TotalCount,
-    //         Page = page,
-    //         PageSize = pageSize
-    //     };
-    // }
 }

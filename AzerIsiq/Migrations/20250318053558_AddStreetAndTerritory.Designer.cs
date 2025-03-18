@@ -4,6 +4,7 @@ using AzerIsiq.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzerIsiq.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250318053558_AddStreetAndTerritory")]
+    partial class AddStreetAndTerritory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -333,18 +336,12 @@ namespace AzerIsiq.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StreetId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SubscriberCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TerritoryId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("TmId")
                         .HasColumnType("int");
@@ -356,10 +353,6 @@ namespace AzerIsiq.Migrations
                     b.HasIndex("DistrictId");
 
                     b.HasIndex("RegionId");
-
-                    b.HasIndex("StreetId");
-
-                    b.HasIndex("TerritoryId");
 
                     b.HasIndex("TmId");
 
@@ -595,16 +588,6 @@ namespace AzerIsiq.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("AzerIsiq.Models.Street", "Street")
-                        .WithMany()
-                        .HasForeignKey("StreetId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("AzerIsiq.Models.Territory", "Territory")
-                        .WithMany()
-                        .HasForeignKey("TerritoryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("AzerIsiq.Models.Tm", "Tm")
                         .WithMany()
                         .HasForeignKey("TmId")
@@ -615,10 +598,6 @@ namespace AzerIsiq.Migrations
                     b.Navigation("District");
 
                     b.Navigation("Region");
-
-                    b.Navigation("Street");
-
-                    b.Navigation("Territory");
 
                     b.Navigation("Tm");
                 });

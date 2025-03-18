@@ -31,6 +31,14 @@ public class SubscriberController : ControllerBase
         return Ok( new { Message = "Success" });
     }
     
+    [HttpPost("sb-code")]
+    public async Task<IActionResult> CreateSbCode(int id)
+    {
+        await _subscriberService.CreateSubscriberCodeAsync(id);
+    
+        return Ok(new { Message = "Success" });
+    }
+    
     [HttpGet]
     public async Task<IActionResult> GetPagedSubscriber(int page = 1, int pageSize = 10)
     {

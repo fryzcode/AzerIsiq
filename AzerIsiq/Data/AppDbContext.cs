@@ -22,6 +22,8 @@ namespace AzerIsiq.Data
         public DbSet<City> Cities { get; set; }
         public DbSet<Counter> Counters { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
+        public DbSet<Territory> Territories { get; set; }
+        public DbSet<Street> Streets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -114,7 +116,18 @@ namespace AzerIsiq.Data
                 .WithMany()
                 .HasForeignKey(s => s.DistrictId)
                 .OnDelete(DeleteBehavior.NoAction);
-
+            
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.Territory)
+                .WithMany()
+                .HasForeignKey(s => s.TerritoryId)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.Street)
+                .WithMany()
+                .HasForeignKey(s => s.StreetId)
+                .OnDelete(DeleteBehavior.NoAction);
+            
             modelBuilder.Entity<Subscriber>()
                 .HasOne(s => s.Counter)
                 .WithMany()
@@ -127,6 +140,17 @@ namespace AzerIsiq.Data
                 .HasForeignKey(s => s.TmId)
                 .OnDelete(DeleteBehavior.Cascade);
             
+            modelBuilder.Entity<Territory>()
+                .HasOne(t => t.District)
+                .WithMany(d => d.Territories)
+                .HasForeignKey(t => t.DistrictId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Street>()
+                .HasOne(s => s.Territory)
+                .WithMany(t => t.Streets)
+                .HasForeignKey(s => s.TerritoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

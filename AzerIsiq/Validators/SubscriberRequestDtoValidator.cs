@@ -21,7 +21,7 @@ public class SubscriberRequestDtoValidator: AbstractValidator<SubscriberRequestD
         RuleFor(s => s.PopulationStatus).NotEmpty().WithMessage("Population status is required.");
         // RuleFor(s => s.City).NotEmpty().MaximumLength(25).WithMessage("City name is required");
         // RuleFor(s => s.District).NotEmpty().MaximumLength(25).WithMessage("District is required");
-        RuleFor(s => s.Building).NotEmpty().MaximumLength(25).WithMessage("Building is required");
-        RuleFor(s => s.Apartment).NotEmpty().MaximumLength(25).WithMessage("Apartment is required");
+        RuleFor(s => s.Building).NotEmpty().WithMessage("Building is required").MaximumLength(4).WithMessage("Maximum building length is 4.");
+        RuleFor(s => s.Apartment).NotEmpty().WithMessage("Apartment is required").MaximumLength(4).WithMessage("Maximum apartment length is 4.");
     }
 }

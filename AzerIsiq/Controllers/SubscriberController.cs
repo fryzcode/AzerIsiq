@@ -31,6 +31,13 @@ public class SubscriberController : ControllerBase
         return Ok( new { Message = "Success" });
     }
     
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var sb = await _subscriberService.GetSubscriberByIdAsync(id);
+        return Ok(sb);
+    }
+    
     [HttpPost("sb-code")]
     public async Task<IActionResult> CreateSbCode(int id)
     {
@@ -47,10 +54,19 @@ public class SubscriberController : ControllerBase
         return Ok(new { Message = "Success" });
     }
     
-    [HttpGet]
-    public async Task<IActionResult> GetPagedSubscriber(int page = 1, int pageSize = 10)
+    [HttpPost("sb-tm")]
+    public async Task<IActionResult> ConnectSbToTm(int id, [FromBody] ConnectTmDto dto)
     {
-        var result = await _subscriberService.GetSubscribersAsync(page, pageSize);
+        await _subscriberService.ConnectTmToSubscriberAsync(id, dto.TmId);
+
+        return Ok(new { Message = "Success" });
+    }
+    
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetSubscriberByFilters(
+        [FromQuery] PagedRequestDto request, [FromQuery] SubscriberFilterDto filter)
+    {
+        var result = await _subscriberService.GetSubscribersFilteredAsync(request, filter);
         return Ok(result);
     }
 }

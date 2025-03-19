@@ -16,7 +16,7 @@ public class GetSubscriberDto
     public int DistrictId { get; set; }
     public string DistrictName { get; set; } = null!;
     public int TerritoryId { get; set; }
-    public string TerriotoryName { get; set; } = null!;
+    public string TerritoryName { get; set; } = null!;
     public int StreetId { get; set; }
     public string StreetName { get; set; } = null!;
     public string Building { get; set; } = null!;

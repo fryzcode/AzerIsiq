@@ -11,6 +11,7 @@ public class SubscriberDto
     public string? PhoneNumber { get; set; }
     public string? FinCode { get; set; }
     public PopulationStatus? PopulationStatus { get; set; }
+    public string? PopulationStatusName => PopulationStatus?.ToString();
     public int? RegionId { get; set; }
     public string? RegionName { get; set; }
     public int? DistrictId { get; set; }

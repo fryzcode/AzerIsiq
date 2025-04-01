@@ -86,7 +86,7 @@ namespace AzerIsiq.Extensions
         public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DBConnectionL")));
+                options.UseSqlServer(configuration.GetConnectionString("DBConnection")));
 
             return services;
         }

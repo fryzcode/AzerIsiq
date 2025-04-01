@@ -37,4 +37,17 @@ public class DistrictController : ControllerBase
         return Ok(new { Message = "Success", Districts = substations.Select(s => new { s.Id, s.Name }) });
     }
     
+    [HttpGet("{id}/territories")]
+    public async Task<IActionResult> GetTerritoryByDistrict(int id)
+    {
+        var territories = await _districtService.GetTerritoryByDistrictAsync(id);
+        return Ok(new { Message = "Success", Territories = territories });
+    }
+    
+    [HttpGet("territory/{id}/streets")]
+    public async Task<IActionResult> GetStreetByTerritory(int id)
+    {
+        var streets = await _districtService.GetStreetByTerritoryAsync(id);
+        return Ok(new { Message = "Success", Streets = streets });
+    }
 }

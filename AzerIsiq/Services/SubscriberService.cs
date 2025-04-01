@@ -1,4 +1,5 @@
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Enum;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
@@ -23,6 +24,13 @@ public class SubscriberService : ISubscriberService
     
     public async Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto)
     {
+        var checkFin = await _subscriberRepository.ExistsBySubscriberFinAsync(dto.FinCode);
+        
+        if (checkFin)
+        {
+            throw new Exception($"SubscriberCode {dto.FinCode} already exists.");
+        }
+        
         var atsCode = await _subscriberRepository.GenerateUniqueAtsAsync();
         
         var subscriber = new Subscriber()
@@ -51,8 +59,9 @@ public class SubscriberService : ISubscriberService
         var subscriber = await _subscriberRepository.GetByIdAsync(id);
         if (subscriber == null)
         {
-            throw new Exception("Not Found");
+            throw new Exception("Subscriber not found");
         }
+
         var districtId = subscriber.DistrictId.ToString().PadLeft(2, '0');
         var territoryId = (subscriber.TerritoryId?.ToString() ?? "00").PadLeft(2, '0');
         var streetId = (subscriber.StreetId?.ToString() ?? "000").PadLeft(3, '0');
@@ -60,18 +69,21 @@ public class SubscriberService : ISubscriberService
         var apartment = (subscriber.Apartment ?? "0").PadLeft(4, '0');
 
         var sbCode = $"{districtId}{territoryId}{streetId}{building}{apartment}";
-    
-        Console.WriteLine(sbCode);
-    
+
+        if (await _subscriberRepository.ExistsBySubscriberCodeAsync(sbCode))
+        {
+            throw new Exception($"SubscriberCode {sbCode} already exists.");
+        }
+
         subscriber.SubscriberCode = sbCode;
 
         if (subscriber.Status == 1)
         {
             subscriber.Status++;
         }
-        
-        await _subscriberRepository.UpdateAsync(subscriber); 
-    
+
+        await _subscriberRepository.UpdateAsync(subscriber);
+
         return subscriber;
     }
     public async Task<Subscriber> CreateCounterForSubscriberAsync(int id, CounterDto dto)
@@ -150,10 +162,13 @@ public class SubscriberService : ISubscriberService
             PageSize = request.PageSize
         };
     }
-    
     public async Task<SubscriberDto> GetSubscriberByIdAsync(int id)
     {
-        var sb = await _subscriberRepository.GetByIdAsync(id);
+        var sb = await _subscriberRepository.GetByIdAsync(id, 
+            s => s.Region, 
+            s => s.District, 
+            s => s.Territory, 
+            s => s.Street);
     
         if (sb == null)
         {
@@ -167,6 +182,7 @@ public class SubscriberService : ISubscriberService
             Surname = sb.Surname,
             Patronymic = sb.Patronymic,
             PhoneNumber = sb.PhoneNumber,
+            PopulationStatus = sb.PopulationStatus,
             FinCode = sb.FinCode,
             RegionId = sb.RegionId,
             RegionName = sb.Region?.Name ?? "N/A",

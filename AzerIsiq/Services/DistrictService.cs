@@ -28,6 +28,32 @@ public class DistrictService : ReadOnlyService<District>, IDistrictService
             DistrictId = substation.DistrictId
         });
     }
+    
+    public async Task<IEnumerable<TerritoryDto>> GetTerritoryByDistrictAsync(int districtId)
+    {
+        ValidateDistrictId(districtId);
+
+        var territories = await _districtRepository.GetTerritoryByDistrictAsync(districtId);
+        return territories.Select(territory => new TerritoryDto()
+        {
+            Id = territory.Id,
+            Name = territory.Name,
+            DistrictId = territory.DistrictId
+        });
+    }
+    
+    public async Task<IEnumerable<StreetDto>> GetStreetByTerritoryAsync(int territiryId)
+    {
+        ValidateDistrictId(territiryId);
+
+        var streets = await _districtRepository.GetStreetByTerritoryAsync(territiryId);
+        return streets.Select(street => new StreetDto()
+        {
+            Id = street.Id,
+            Name = street.Name,
+            TerritoryId = street.TerritoryId
+        });
+    }
 
     public async Task<IEnumerable<TmDto>> GetTmsByDistrictAsync(int districtId)
     {
@@ -43,9 +69,9 @@ public class DistrictService : ReadOnlyService<District>, IDistrictService
         });
     }
 
-    private static void ValidateDistrictId(int districtId)
+    private static void ValidateDistrictId(int id)
     {
-        if (districtId <= 0) throw new ArgumentException("District ID must be greater than zero.", nameof(districtId));
+        if (id <= 0) throw new ArgumentException("ID must be greater than zero.", nameof(id));
     }
     
 }

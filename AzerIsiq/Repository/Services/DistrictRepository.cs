@@ -26,4 +26,14 @@ public class DistrictRepository : ReadOnlyRepository<District>, IDistrictReposit
             .Where(tm => tm.Substation.DistrictId == districtId)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Territory>> GetTerritoryByDistrictAsync(int districtId)
+    {
+        return await _context.Territories.Where(t => t.DistrictId == districtId).ToListAsync();
+    }
+    
+    public async Task<IEnumerable<Street>> GetStreetByTerritoryAsync(int territoryId)
+    {
+        return await _context.Streets.Where(s => s.TerritoryId == territoryId).ToListAsync();
+    }
 }

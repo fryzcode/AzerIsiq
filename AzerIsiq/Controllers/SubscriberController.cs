@@ -39,7 +39,7 @@ public class SubscriberController : ControllerBase
     }
     
     [HttpPost("sb-code")]
-    public async Task<IActionResult> CreateSbCode(int id)
+    public async Task<IActionResult> CreateSbCode([FromQuery] int id)
     {
         await _subscriberService.CreateSubscriberCodeAsync(id);
     
@@ -47,7 +47,7 @@ public class SubscriberController : ControllerBase
     }
     
     [HttpPost("sb-counter")]
-    public async Task<IActionResult> CreateSbCounter(int id, CounterDto dto)
+    public async Task<IActionResult> CreateSbCounter ([FromQuery] int id, CounterDto dto)
     {
         await _subscriberService.CreateCounterForSubscriberAsync(id, dto);
     
@@ -62,6 +62,18 @@ public class SubscriberController : ControllerBase
         return Ok(new { Message = "Success" });
     }
     
+    [HttpPost("sb-apply")]
+    public async Task<IActionResult> ApplySubscriberContract(int id)
+    {
+        var (isConfirmed, subscriber) = await _subscriberService.ApplySubscriberContractAsync(id);
+
+        if (isConfirmed)
+        {
+            return Ok(new { Message = "Subscriber is already confirmed"});
+        }
+
+        return Ok(new { Message = "Subscriber successfully confirmed"});
+    }
     [HttpGet("filtered")]
     public async Task<IActionResult> GetSubscriberByFilters(
         [FromQuery] PagedRequestDto request, [FromQuery] SubscriberFilterDto filter)

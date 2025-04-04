@@ -127,6 +127,29 @@ public class SubscriberService : ISubscriberService
         await _subscriberRepository.UpdateAsync(subscriber); 
         return subscriber;
     }
+    public async Task<(bool IsConfirmed, Subscriber Subscriber)> ApplySubscriberContractAsync(int id)
+    {
+        var subscriber = await _subscriberRepository.GetByIdAsync(id);
+        if (subscriber == null)
+        {
+            throw new Exception("Not Found");
+        }
+    
+        if (subscriber.Status >= 5)
+        {
+            return (true, subscriber);
+        }
+
+        if (subscriber.Status == 4)
+        {
+            subscriber.Status = 5;
+            await _subscriberRepository.UpdateAsync(subscriber);
+        }
+
+        return (false, subscriber);
+    }
+
+
     public async Task<PagedResultDto<SubscriberDto>> GetSubscribersFilteredAsync(PagedRequestDto request, SubscriberFilterDto dtoFilter)
     {
         var subscribers = await _subscriberRepository.GetSubscriberByFiltersAsync(dtoFilter);

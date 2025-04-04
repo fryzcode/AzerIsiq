@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+dynamic a = 5.ToString();
+dynamic b = 10;
+
+Console.WriteLine(a + b);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
@@ -24,8 +29,8 @@ builder.Services.AddSwaggerGen();
 builder.WebHost.ConfigureKestrel(options =>
 {
     //For Docker
-    options.ListenAnyIP(5252); 
-    // options.ListenAnyIP(5297);
+    // options.ListenAnyIP(5252); 
+    options.ListenAnyIP(5297);
     // options.ListenAnyIP(6000);
 });
 

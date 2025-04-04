@@ -81,6 +81,9 @@ public class SubscriberRepository : GenericRepository<Subscriber>, ISubscriberRe
 
         if (dto.CreatedDate.HasValue)
             query = query.Where(s => s.CreatedAt.Date == dto.CreatedDate.Value.Date);
+        
+        if (!dto.CreatedDate.HasValue)
+            query = query.OrderByDescending(s => s.CreatedAt);
 
         var totalCount = await query.CountAsync();
 

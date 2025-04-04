@@ -9,6 +9,7 @@ public interface ISubscriberService
     Task<Subscriber> CreateSubscriberCodeAsync(int id);
     Task<Subscriber> CreateCounterForSubscriberAsync(int id, CounterDto dto);
     Task<Subscriber> ConnectTmToSubscriberAsync(int id, int tmId);
+    Task<(bool IsConfirmed, Subscriber Subscriber)> ApplySubscriberContractAsync(int id);
     Task<SubscriberDto> GetSubscriberByIdAsync(int id);
     Task<PagedResultDto<SubscriberDto>> GetSubscribersFilteredAsync(PagedRequestDto request,
         SubscriberFilterDto dtoFilter);

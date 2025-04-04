@@ -3,12 +3,13 @@ using AzerIsiq.Services.ILogic;
 using Microsoft.AspNetCore.Mvc;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Data.ResponseModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize(Roles = "Admin")]
+[Authorize] // (Roles = "Admin")
 public class RegionController : ControllerBase
 {
     private readonly IRegionService _regionService;

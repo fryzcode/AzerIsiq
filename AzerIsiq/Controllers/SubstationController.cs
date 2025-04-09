@@ -64,4 +64,14 @@ public class SubstationController : ControllerBase
         await _substationService.DeleteSubstationAsync(id);
         return Ok(new { message = "Substation successfully deleted" });
     }
+    
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetSubstationsByFilters(
+        [FromQuery] PagedRequestDto request, 
+        [FromQuery] int? regionId, 
+        [FromQuery] int? districtId)
+    {
+        var result = await _substationService.GetSubstationsByFiltersAsync(request, regionId, districtId);
+        return Ok(result);
+    }
 }

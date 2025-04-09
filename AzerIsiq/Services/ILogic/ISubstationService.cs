@@ -14,4 +14,5 @@ public interface ISubstationService
     Task<SubstationGetDto> GetSubstationByIdAsync(int id);
     Task ValidateRegionAndDistrictAsync(SubstationDto dto);
     Task<PagedResultDto<SubstationDto>> GetSubstationByDistrictAsync(PagedRequestDto request, int districtId);
+    Task<PagedResultDto<SubstationDto>> GetSubstationsByFiltersAsync(PagedRequestDto request, int? regionId, int? districtId);
 }

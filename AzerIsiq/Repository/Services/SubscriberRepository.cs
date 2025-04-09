@@ -139,7 +139,6 @@ public class SubscriberRepository : GenericRepository<Subscriber>, ISubscriberRe
 
         return atsCode;
     }
-    
     public async Task<bool> ExistsBySubscriberCodeAsync(string subscriberCode)
     {
         return await _context.Subscribers.AnyAsync(s => s.SubscriberCode == subscriberCode);

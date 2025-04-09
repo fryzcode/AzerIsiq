@@ -1,8 +1,10 @@
+using AutoMapper;
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.Enum;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using AzerIsiq.Services.Helpers;
 using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Services;
@@ -10,16 +12,24 @@ namespace AzerIsiq.Services;
 public class SubscriberService : ISubscriberService
 {
     private readonly ISubscriberRepository _subscriberRepository;
-    private readonly IRegionRepository _regionRepository;
     private readonly ICounterService _counterService;
     private readonly ITmService _tmService;
+    private readonly IMapper _mapper;
+    private readonly ISubscriberCodeGenerator _codeGenerator;
     
-    public SubscriberService(ISubscriberRepository subscriberRepository, IRegionRepository regionRepository, ICounterService counterService, ITmService tmService)
+    public SubscriberService(
+        ISubscriberRepository subscriberRepository, 
+        ICounterService counterService, 
+        ITmService tmService, 
+        IMapper mapper, 
+        ISubscriberCodeGenerator codeGenerator
+        )
     {
         _subscriberRepository = subscriberRepository;
-        _regionRepository = regionRepository;
         _counterService = counterService;
         _tmService = tmService;
+        _mapper = mapper;
+        _codeGenerator = codeGenerator;
     }
     
     public async Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto)
@@ -33,22 +43,10 @@ public class SubscriberService : ISubscriberService
         
         var atsCode = await _subscriberRepository.GenerateUniqueAtsAsync();
         
-        var subscriber = new Subscriber()
-        {
-            Name = dto.Name,
-            Surname = dto.Surname,
-            Patronymic = dto.Patronymic,
-            PhoneNumber = dto.PhoneNumber,
-            FinCode = dto.FinCode,
-            PopulationStatus = dto.PopulationStatus,
-            RegionId = dto.RegionId,
-            DistrictId = dto.DistrictId,
-            TerritoryId = dto.TerritoryId,
-            StreetId = dto.StreetId,
-            Building = dto.Building.ToLower(),
-            Apartment = dto.Apartment.ToLower(),
-            Ats = atsCode
-        };
+        var subscriber = _mapper.Map<Subscriber>(dto);
+        subscriber.Building = dto.Building.ToLower();
+        subscriber.Apartment = dto.Apartment.ToLower();
+        subscriber.Ats = atsCode;
         
         var result = await _subscriberRepository.CreateAsync(subscriber);
 
@@ -56,19 +54,10 @@ public class SubscriberService : ISubscriberService
     }
     public async Task<Subscriber> CreateSubscriberCodeAsync(int id)
     {
-        var subscriber = await _subscriberRepository.GetByIdAsync(id);
-        if (subscriber == null)
-        {
-            throw new Exception("Subscriber not found");
-        }
+        var subscriber = await _subscriberRepository.GetByIdAsync(id)
+                         ?? throw new NotFoundException("Subscriber not found");
 
-        var districtId = subscriber.DistrictId.ToString().PadLeft(2, '0');
-        var territoryId = (subscriber.TerritoryId?.ToString() ?? "00").PadLeft(2, '0');
-        var streetId = (subscriber.StreetId?.ToString() ?? "000").PadLeft(3, '0');
-        var building = (subscriber.Building ?? "0").PadLeft(4, '0');
-        var apartment = (subscriber.Apartment ?? "0").PadLeft(4, '0');
-
-        var sbCode = $"{districtId}{territoryId}{streetId}{building}{apartment}";
+        var sbCode = _codeGenerator.Generate(subscriber);
 
         if (await _subscriberRepository.ExistsBySubscriberCodeAsync(sbCode))
         {
@@ -148,8 +137,6 @@ public class SubscriberService : ISubscriberService
 
         return (false, subscriber);
     }
-
-
     public async Task<PagedResultDto<SubscriberDto>> GetSubscribersFilteredAsync(PagedRequestDto request, SubscriberFilterDto dtoFilter)
     {
         var subscribers = await _subscriberRepository.GetSubscriberByFiltersAsync(dtoFilter);

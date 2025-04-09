@@ -238,4 +238,25 @@ public class SubstationService : ISubstationService
         };
     }
 
+    public async Task<PagedResultDto<SubstationDto>> GetSubstationsByFiltersAsync(PagedRequestDto request, int? regionId, int? districtId)
+    {
+        var pagedSubstations = await _substationRepository.GetSubstationsByFiltersAsync(regionId, districtId, request.Page, request.PageSize);
+
+        return new PagedResultDto<SubstationDto>
+        {
+            Items = pagedSubstations.Items.Select(s => new SubstationDto
+            {
+                Id = s.Id,
+                Name = s.Name ?? "",
+                RegionId = s.District?.RegionId ?? 0,
+                DistrictId = s.DistrictId,
+                Address = s.Location?.Address ?? "The address is not specified",
+                Longitude = s.Location != null ? s.Location.Longitude.ToString("F6") : "The longitude is not specified",
+                Latitude = s.Location != null ? s.Location.Latitude.ToString("F6") : "The latitude is not specified",
+            }).ToList(),
+            TotalCount = pagedSubstations.TotalCount,
+            Page = request.Page,
+            PageSize = request.PageSize
+        };
+    }
 }

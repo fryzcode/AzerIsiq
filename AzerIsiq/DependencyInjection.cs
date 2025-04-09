@@ -11,8 +11,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Mapping;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
+using AzerIsiq.Services.Helpers;
 using AzerIsiq.Services.ILogic;
 using AzerIsiq.Validators;
 using Microsoft.AspNetCore.Mvc;
@@ -56,12 +58,15 @@ namespace AzerIsiq.Extensions
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ICounterService, CounterService>();
+            services.AddScoped<ISubscriberCodeGenerator, SubscriberCodeGenerator>();
 
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<LoggingService>();
             services.AddScoped<OtpService>();
             services.AddScoped<JwtService>();
             
+            services.AddAutoMapper(typeof(AutoMapping));
+
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

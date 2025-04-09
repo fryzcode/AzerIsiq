@@ -65,11 +65,8 @@ public class SubscriberService : ISubscriberService
         }
 
         subscriber.SubscriberCode = sbCode;
-
-        if (subscriber.Status == 1)
-        {
-            subscriber.Status++;
-        }
+        
+        subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.Initial);
 
         await _subscriberRepository.UpdateAsync(subscriber);
 
@@ -77,20 +74,14 @@ public class SubscriberService : ISubscriberService
     }
     public async Task<Subscriber> CreateCounterForSubscriberAsync(int id, CounterDto dto)
     {
-        var subscriber = await _subscriberRepository.GetByIdAsync(id);
-        if (subscriber == null)
-        {
-            throw new Exception("Not Found");
-        }
+        var subscriber = await _subscriberRepository.GetByIdAsync(id)
+                         ?? throw new NotFoundException("Subscriber not found");
 
         var counter = await _counterService.CreateCountersAsync(dto);
         
         subscriber.CounterId = counter.Id;
         
-        if (subscriber.Status == 2)
-        {
-            subscriber.Status++;
-        }
+        subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CodeGenerated);
         
         await _subscriberRepository.UpdateAsync(subscriber); 
         
@@ -98,40 +89,31 @@ public class SubscriberService : ISubscriberService
     }
     public async Task<Subscriber> ConnectTmToSubscriberAsync(int id, int tmId)
     {
-        var subscriber = await _subscriberRepository.GetByIdAsync(id);
-        if (subscriber == null)
-        {
-            throw new Exception("Not Found");
-        }
+        var subscriber = await _subscriberRepository.GetByIdAsync(id)
+                         ?? throw new NotFoundException("Subscriber not found");
 
         await _tmService.GetTmByIdAsync(tmId);
         
         subscriber.TmId = tmId;
         
-        if (subscriber.Status == 3)
-        {
-            subscriber.Status++;
-        }
+        subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CounterConnected);
         
         await _subscriberRepository.UpdateAsync(subscriber); 
         return subscriber;
     }
     public async Task<(bool IsConfirmed, Subscriber Subscriber)> ApplySubscriberContractAsync(int id)
     {
-        var subscriber = await _subscriberRepository.GetByIdAsync(id);
-        if (subscriber == null)
-        {
-            throw new Exception("Not Found");
-        }
+        var subscriber = await _subscriberRepository.GetByIdAsync(id)
+                         ?? throw new NotFoundException("Subscriber not found");
     
-        if (subscriber.Status >= 5)
+        if (subscriber.Status >= (int)SubscriberStatus.ContractSigned)
         {
             return (true, subscriber);
         }
 
-        if (subscriber.Status == 4)
+        if (subscriber.Status == (int)SubscriberStatus.TmConnected)
         {
-            subscriber.Status = 5;
+            subscriber.Status = (int)SubscriberStatus.ContractSigned;
             await _subscriberRepository.UpdateAsync(subscriber);
         }
 
@@ -140,33 +122,10 @@ public class SubscriberService : ISubscriberService
     public async Task<PagedResultDto<SubscriberDto>> GetSubscribersFilteredAsync(PagedRequestDto request, SubscriberFilterDto dtoFilter)
     {
         var subscribers = await _subscriberRepository.GetSubscriberByFiltersAsync(dtoFilter);
-
+        var subscriberDtos = _mapper.Map<List<SubscriberDto>>(subscribers.Items);
         return new PagedResultDto<SubscriberDto>
         {
-            Items = subscribers.Items.Select(s => new SubscriberDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Surname = s.Surname,
-                Patronymic = s.Patronymic,
-                PhoneNumber = s.PhoneNumber,
-                FinCode = s.FinCode,
-                PopulationStatus = s.PopulationStatus,
-                RegionId = s.RegionId,
-                RegionName = s.RegionName,
-                DistrictId = s.DistrictId,
-                DistrictName = s.DistrictName,
-                TerritoryId = s.TerritoryId,
-                TerritoryName = s.TerritoryName,
-                StreetId = s.StreetId,
-                StreetName = s.StreetName,
-                Building = s.Building,
-                Apartment = s.Apartment,
-                Status = s.Status,
-                Ats = s.Ats,
-                SubscriberCode = s.SubscriberCode,
-                CreatedAt = s.CreatedAt
-            }).ToList(),
+            Items = subscriberDtos,
             TotalCount = subscribers.TotalCount,
             Page = request.Page,
             PageSize = request.PageSize
@@ -179,35 +138,12 @@ public class SubscriberService : ISubscriberService
             s => s.District, 
             s => s.Territory, 
             s => s.Street);
-    
+            
         if (sb == null)
         {
             throw new NotFoundException($"Not found Subscriber by ID {id}.");
         }
-    
-        return new SubscriberDto
-        {
-            Id = sb.Id,
-            Name = sb.Name,
-            Surname = sb.Surname,
-            Patronymic = sb.Patronymic,
-            PhoneNumber = sb.PhoneNumber,
-            PopulationStatus = sb.PopulationStatus,
-            FinCode = sb.FinCode,
-            RegionId = sb.RegionId,
-            RegionName = sb.Region?.Name ?? "N/A",
-            DistrictId = sb.DistrictId,
-            DistrictName = sb.District?.Name ?? "N/A",
-            TerritoryId = sb.TerritoryId,
-            TerritoryName = sb.Territory?.Name ?? "N/A",
-            StreetId = sb.StreetId,
-            StreetName = sb.Street?.Name ?? "N/A",
-            Building = sb.Building,
-            Apartment = sb.Apartment,
-            Status = sb.Status,
-            Ats = sb.Ats,
-            SubscriberCode = sb.SubscriberCode,
-            CreatedAt = sb.CreatedAt
-        };
+
+        return _mapper.Map<SubscriberDto>(sb);
     }
 }

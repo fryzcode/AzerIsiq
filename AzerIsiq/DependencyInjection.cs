@@ -65,7 +65,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<OtpService>();
             services.AddScoped<JwtService>();
             
-            services.AddAutoMapper(typeof(AutoMapping));
+            services.AddAutoMapper(typeof(SubscriberProfile));
 
             services.AddHttpContextAccessor();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

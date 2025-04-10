@@ -366,7 +366,7 @@ namespace AzerIsiq.Migrations
                     b.ToTable("Subscribers");
                 });
 
-            modelBuilder.Entity("AzerIsiq.Models.Substation", b =>
+            modelBuilder.Entity("AzerIsiq.Models.SubstationDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -530,7 +530,7 @@ namespace AzerIsiq.Migrations
 
             modelBuilder.Entity("AzerIsiq.Models.Image", b =>
                 {
-                    b.HasOne("AzerIsiq.Models.Substation", "Substation")
+                    b.HasOne("AzerIsiq.Models.SubstationDto", "SubstationDto")
                         .WithMany("Images")
                         .HasForeignKey("SubstationId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -540,7 +540,7 @@ namespace AzerIsiq.Migrations
                         .HasForeignKey("TmId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("Substation");
+                    b.Navigation("SubstationDto");
 
                     b.Navigation("Tm");
                 });
@@ -623,7 +623,7 @@ namespace AzerIsiq.Migrations
                     b.Navigation("Tm");
                 });
 
-            modelBuilder.Entity("AzerIsiq.Models.Substation", b =>
+            modelBuilder.Entity("AzerIsiq.Models.SubstationDto", b =>
                 {
                     b.HasOne("AzerIsiq.Models.District", "District")
                         .WithMany("Substations")
@@ -658,7 +658,7 @@ namespace AzerIsiq.Migrations
                         .WithMany()
                         .HasForeignKey("LocationId");
 
-                    b.HasOne("AzerIsiq.Models.Substation", "Substation")
+                    b.HasOne("AzerIsiq.Models.SubstationDto", "SubstationDto")
                         .WithMany("Tms")
                         .HasForeignKey("SubstationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -666,7 +666,7 @@ namespace AzerIsiq.Migrations
 
                     b.Navigation("Location");
 
-                    b.Navigation("Substation");
+                    b.Navigation("SubstationDto");
                 });
 
             modelBuilder.Entity("AzerIsiq.Models.UserRole", b =>
@@ -710,7 +710,7 @@ namespace AzerIsiq.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("AzerIsiq.Models.Substation", b =>
+            modelBuilder.Entity("AzerIsiq.Models.SubstationDto", b =>
                 {
                     b.Navigation("Images");
 

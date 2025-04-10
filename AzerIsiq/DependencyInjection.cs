@@ -44,6 +44,9 @@ namespace AzerIsiq.Extensions
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<ISubscriberRepository, SubscriberRepository>();
             services.AddScoped<ICounterRepository, CounterRepository>();
+            services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
+            services.AddScoped<ILoggerRepository, LoggerRepository>();
+
             
             // Services
             services.AddScoped(typeof(IReadOnlyService<>), typeof(ReadOnlyService<>));
@@ -61,7 +64,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ISubscriberCodeGenerator, SubscriberCodeGenerator>();
 
             services.AddScoped<IImageService, ImageService>();
-            services.AddScoped<LoggingService>();
+            services.AddScoped<ILoggingService, LoggingService>();
             services.AddScoped<OtpService>();
             services.AddScoped<JwtService>();
             

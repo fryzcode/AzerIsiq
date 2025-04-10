@@ -1,3 +1,4 @@
+using AzerIsiq.Dtos.LogEntryDto;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services;
@@ -5,25 +6,49 @@ using AzerIsiq.Services.ILogic;
 
 namespace AzerIsiq.Extensions.Repository;
 
-public class LoggingService
+public class LoggingService:ILoggingService
 {
-    private readonly ILoggerRepository _logger;
+    private readonly ILoggerRepository _loggerRepository;
     private readonly IAuthService _authService;
 
-    public LoggingService(ILoggerRepository logger, IAuthService authService)
+    public LoggingService(ILoggerRepository loggerRepository, IAuthService authService)
     {
-        _logger = logger;
+        _loggerRepository = loggerRepository;
         _authService = authService;
     }
-
+    
+    public async Task<IEnumerable<LogEntryDto>> GetLogsAsync(LogEntryFilterDto filter)
+    {
+        return await _loggerRepository.GetFilteredAsync(filter);
+    }
+    
+    public async Task<int> CountLogsAsync(LogEntryFilterDto filter)
+    {
+        return await _loggerRepository.CountFilteredAsync(filter);
+    }
+    
     public async Task LogActionAsync(string action, string entityName, int entityId)
     {
-        await _logger.LogAsync(new LogEntry()
+        var logEntry = new LogEntry
         {
             Action = action,
-            EntityName = entityName,
             EntityId = entityId,
-            UserId = _authService.GetCurrentUserId()
-        });
+            EntityName = entityName,
+            UserId = _authService.GetCurrentUserId(),
+            Timestamp = DateTime.UtcNow
+        };
+
+        await _loggerRepository.LogAsync(logEntry);
     }
+
+    // public async Task LogActionAsync(string action, string entityName, int entityId)
+    // {
+    //     await _logger.LogAsync(new LogEntry()
+    //     {
+    //         Action = action,
+    //         EntityName = entityName,
+    //         EntityId = entityId,
+    //         UserId = _authService.GetCurrentUserId()
+    //     });
+    // }
 }

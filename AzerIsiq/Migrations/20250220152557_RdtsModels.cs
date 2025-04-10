@@ -37,7 +37,7 @@ namespace AzerIsiq.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Substation",
+                name: "SubstationDto",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -91,7 +91,7 @@ namespace AzerIsiq.Migrations
                     table.ForeignKey(
                         name: "FK_QuickSearchRdsts_Substation_SubstationId",
                         column: x => x.SubstationId,
-                        principalTable: "Substation",
+                        principalTable: "SubstationDto",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -136,7 +136,7 @@ namespace AzerIsiq.Migrations
                 name: "Regions");
 
             migrationBuilder.DropTable(
-                name: "Substation");
+                name: "SubstationDto");
 
             migrationBuilder.DropTable(
                 name: "Tms");

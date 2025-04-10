@@ -62,7 +62,7 @@ public class SubstationController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         await _substationService.DeleteSubstationAsync(id);
-        return Ok(new { message = "Substation successfully deleted" });
+        return Ok(new { message = "SubstationDto successfully deleted" });
     }
     
     [HttpGet("filtered")]

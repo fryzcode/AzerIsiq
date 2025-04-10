@@ -17,7 +17,7 @@ public class SubstationService : ISubstationService
     private readonly ILocationService _locationService;
     private readonly IImageRepository _imageRepository;
     private readonly IImageService _imageService;
-    private readonly LoggingService _loggingService;
+    private readonly ILoggingService _loggingService;
     private readonly IMapper _mapper;
 
     public SubstationService(
@@ -27,7 +27,7 @@ public class SubstationService : ISubstationService
         IImageRepository imageRepository,
         ILocationService locationService,
         IImageService imageService, 
-        LoggingService loggingService,
+        ILoggingService loggingService,
         IMapper mapper)
     {
         _substationRepository = substationRepository;
@@ -82,7 +82,7 @@ public class SubstationService : ISubstationService
             await _imageService.UpdateSubOrTmImageAsync(image);
         }
 
-        await _loggingService.LogActionAsync("Create", nameof(Subscriber), createdSubstation.Id);
+        await _loggingService.LogActionAsync("Create", nameof(Substation), createdSubstation.Id);
         return createdSubstation;
     }
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
@@ -110,7 +110,7 @@ public class SubstationService : ISubstationService
             await UpdateSubstationImageAsync(substation.Id, dto.Image);
         }
 
-        await _loggingService.LogActionAsync("Edit", nameof(Subscriber), id);
+        await _loggingService.LogActionAsync("Edit", nameof(Substation), id);
 
         return substation;
     }
@@ -134,7 +134,7 @@ public class SubstationService : ISubstationService
         
         await _substationRepository.DeleteAsync(substation.Id);
         
-        await _loggingService.LogActionAsync("Delete", nameof(Subscriber), id);
+        await _loggingService.LogActionAsync("Delete", nameof(Substation), id);
         return true;
     }
     public async Task ValidateRegionAndDistrictAsync(SubstationDto dto)

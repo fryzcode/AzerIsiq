@@ -12,6 +12,6 @@ public class TmDtoValidator : AbstractValidator<TmDto>
 
         RuleFor(x => x.SubstationId)
             .GreaterThan(0)
-            .WithMessage("Uncorrect Substation");
+            .WithMessage("Uncorrect SubstationDto");
     }
 }

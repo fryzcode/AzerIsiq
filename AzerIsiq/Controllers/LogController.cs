@@ -15,8 +15,8 @@ public class LogController : ControllerBase
         _logService = logService;
     }
 
-    [HttpPost("filter")]
-    public async Task<IActionResult> GetFiltered([FromBody] LogEntryFilterDto filter)
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetFiltered([FromQuery] LogEntryFilterDto filter)
     {
         var logs = await _logService.GetLogsAsync(filter);
         var totalCount = await _logService.CountLogsAsync(filter);

@@ -1,17 +1,14 @@
 ﻿using AzerIsiq.Data;
+using AzerIsiq.Dtos;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace AzerIsiq.Repository.Services;
-public class UserRepository : IUserRepository
-{
-    private readonly AppDbContext _context;
 
-    public UserRepository(AppDbContext context)
-    {
-        _context = context;
-    }
+public class UserRepository : GenericRepository<User>, IUserRepository
+{
+    public UserRepository(AppDbContext context) : base(context) { }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
@@ -31,26 +28,12 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(u => u.RefreshToken == string.Empty);
     }
 
-    public async Task<User?> GetUserWithRolesAsync(int Id)
+    public async Task<User?> GetUserWithRolesAsync(int id)
     {
         return await _context.Users
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.Id == Id);
-    }
-
-    public async Task<User> CreateAsync(User user)
-    {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return user;
-    }
-
-    public async Task<User> UpdateAsync(User user)
-    {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
-        return user;
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task AddUserRoleAsync(int userId, int roleId)
@@ -58,6 +41,7 @@ public class UserRepository : IUserRepository
         _context.UserRoles.Add(new UserRole { UserId = userId, RoleId = roleId });
         await _context.SaveChangesAsync();
     }
+
     public async Task<List<string>> GetUserRolesAsync(int userId)
     {
         return await _context.UserRoles
@@ -65,7 +49,6 @@ public class UserRepository : IUserRepository
             .Select(ur => ur.Role.RoleName)
             .ToListAsync();
     }
-
 
     public async Task UpdateRefreshTokenAsync(int userId, string refreshToken, DateTime expiryTime)
     {
@@ -77,7 +60,7 @@ public class UserRepository : IUserRepository
             await _context.SaveChangesAsync();
         }
     }
-    
+
     public async Task UpdateResetTokenAsync(int userId, string resetToken, DateTime expiryTime)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -88,10 +71,11 @@ public class UserRepository : IUserRepository
             await _context.SaveChangesAsync();
         }
     }
-    
+
     public async Task<User?> GetByResetTokenAsync(string token)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.ResetToken == token && u.ResetTokenExpiration > DateTime.UtcNow);
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.ResetToken == token && u.ResetTokenExpiration > DateTime.UtcNow);
     }
 
     public async Task UpdatePasswordAsync(int userId, string newPasswordHash)
@@ -105,4 +89,53 @@ public class UserRepository : IUserRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+    public async Task<List<User>> GetUsersAsync(UserQueryParameters parameters)
+    {
+        var query = _context.Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(parameters.Search))
+        {
+            var searchLower = parameters.Search.ToLower();
+            query = query.Where(u =>
+                u.Email.ToLower().Contains(searchLower) ||
+                u.UserName.ToLower().Contains(searchLower));
+        }
+
+        if (!string.IsNullOrWhiteSpace(parameters.Role))
+        {
+            query = query.Where(u =>
+                u.UserRoles.Any(ur => ur.Role.RoleName == parameters.Role));
+        }
+
+        int skip = (parameters.Page - 1) * parameters.PageSize;
+        query = query.Skip(skip).Take(parameters.PageSize);
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<int> GetUsersCountAsync(UserQueryParameters parameters)
+    {
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(parameters.Search))
+        {
+            var searchLower = parameters.Search.ToLower();
+            query = query.Where(u =>
+                u.Email.ToLower().Contains(searchLower) ||
+                u.UserName.ToLower().Contains(searchLower));
+        }
+
+        if (!string.IsNullOrWhiteSpace(parameters.Role))
+        {
+            query = query.Where(u =>
+                u.UserRoles.Any(ur => ur.Role.RoleName == parameters.Role));
+        }
+
+        return await query.CountAsync();
+    }
+
 }

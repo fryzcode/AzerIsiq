@@ -62,6 +62,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ICounterService, CounterService>();
             services.AddScoped<ISubscriberCodeGenerator, SubscriberCodeGenerator>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<ILoggingService, LoggingService>();

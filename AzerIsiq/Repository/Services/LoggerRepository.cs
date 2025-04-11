@@ -32,6 +32,7 @@ public class LoggerRepository : ILoggerRepository
         SELECT 
             l.Id, 
             l.EntityName AS EntryName, 
+            l.Action,
             l.EntityId AS EntryId,
             u.UserName, 
             STRING_AGG(r.RoleName, ', ') AS UserRole, 
@@ -56,6 +57,12 @@ public class LoggerRepository : ILoggerRepository
             sql += " AND r.RoleName = @UserRole";
             parameters.Add("UserRole", filter.UserRole);
         }
+        
+        if (!string.IsNullOrEmpty(filter.Action))
+        {
+            sql += " AND l.Action = @Action";
+            parameters.Add("Action", filter.Action);
+        }
 
         if (!string.IsNullOrEmpty(filter.UserNameSearch))
         {
@@ -76,7 +83,7 @@ public class LoggerRepository : ILoggerRepository
         }
 
         sql += @"
-        GROUP BY l.Id, l.EntityName, l.EntityId, u.UserName, l.Timestamp
+        GROUP BY l.Id, l.EntityName, l.Action, l.EntityId, u.UserName, l.Timestamp
         ORDER BY l.Timestamp DESC
         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY
     ";
@@ -91,9 +98,10 @@ public class LoggerRepository : ILoggerRepository
             Id = row.Id,
             EntryName = row.EntryName,
             EntryId = row.EntryId,
+            Action = row.Action,
             UserName = row.UserName,
             UserRoles = (row.UserRole as string)?.Split(", ").ToList() ?? new List<string>(),
-            Timestamp = row.Timestamp
+            Timestamp = TimeZoneInfo.ConvertTimeToUtc(row.Timestamp)
         });
 
         return result;

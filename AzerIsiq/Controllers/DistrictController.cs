@@ -7,7 +7,7 @@ namespace AzerIsiq.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class DistrictController : ControllerBase
 {
     private readonly IDistrictService _districtService;

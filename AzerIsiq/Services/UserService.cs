@@ -1,5 +1,6 @@
 using AutoMapper;
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services.ILogic;
 
@@ -36,5 +37,15 @@ public class UserService : IUserService
     {
         var user = await _userRepository.GetUserWithRolesAsync(id);
         return user == null ? null : _mapper.Map<UserDto>(user);
+    }
+    
+    public async Task BlockUserAsync(int userId, bool isBlocked)
+    {
+        var user = await _userRepository.GetByIdAsync(userId)
+            ?? throw new NotFoundException("User not found");
+
+        user.IsBlocked = isBlocked;
+
+        await _userRepository.UpdateAsync(user);
     }
 }

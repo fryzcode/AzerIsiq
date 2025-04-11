@@ -4,12 +4,14 @@ using AzerIsiq.Services;
 using AzerIsiq.Services.ILogic;
 using AzerIsiq.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class SubscriberController : ControllerBase
 {
     private readonly ISubscriberService _subscriberService;

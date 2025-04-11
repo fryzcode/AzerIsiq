@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services.ILogic;
@@ -60,6 +61,9 @@ public class AuthService : IAuthService
         var user = await _userRepository.GetByEmailAsync(dto.Email);
         if (user == null)
             throw new UnauthorizedAccessException("Invalid email or password.");
+        
+        if (user.IsBlocked)
+            throw new ForbiddenException("User is blocked.");
         
         if (user.LastFailedAttempt.HasValue && user.FailedAttempts >= 3)
         {

@@ -8,8 +8,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class SubstationController : ControllerBase
 {
     private readonly ISubstationService _substationService;

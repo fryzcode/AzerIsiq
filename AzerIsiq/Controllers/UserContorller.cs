@@ -2,12 +2,14 @@ using AzerIsiq.Dtos;
 using AzerIsiq.Dtos.LogEntryDto;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services.ILogic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -29,5 +31,12 @@ public class UsersController : ControllerBase
     {
         var user = await _userService.GetUserByIdAsync(id);
         return Ok(user);
+    }
+    
+    [HttpPost("block")]
+    public async Task<IActionResult> BlockUser([FromBody] BlockUserDto dto)
+    {
+        await _userService.BlockUserAsync(dto.UserId, dto.IsBlocked);
+        return Ok(new { message = $"User {(dto.IsBlocked ? "blocked" : "unblocked")}" });
     }
 }

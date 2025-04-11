@@ -32,6 +32,7 @@ public class LoggerRepository : ILoggerRepository
         SELECT 
             l.Id, 
             l.EntityName AS EntryName, 
+            l.UserId AS UserId,
             l.Action,
             l.EntityId AS EntryId,
             u.UserName, 
@@ -83,10 +84,10 @@ public class LoggerRepository : ILoggerRepository
         }
 
         sql += @"
-        GROUP BY l.Id, l.EntityName, l.Action, l.EntityId, u.UserName, l.Timestamp
+        GROUP BY l.Id, l.EntityName, l.Action, l.EntityId, u.UserName, l.Timestamp, l.UserId
         ORDER BY l.Timestamp DESC
         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY
-    ";
+        ";
 
         parameters.Add("Offset", (filter.Page - 1) * filter.PageSize);
         parameters.Add("PageSize", filter.PageSize);
@@ -100,6 +101,7 @@ public class LoggerRepository : ILoggerRepository
             EntryId = row.EntryId,
             Action = row.Action,
             UserName = row.UserName,
+            UserId = row.UserId,
             UserRoles = (row.UserRole as string)?.Split(", ").ToList() ?? new List<string>(),
             Timestamp = TimeZoneInfo.ConvertTimeToUtc(row.Timestamp)
         });
@@ -154,103 +156,4 @@ public class LoggerRepository : ILoggerRepository
 
         return await connection.ExecuteScalarAsync<int>(sql, parameters);
     }
-    
-    // public async Task<IEnumerable<LogEntryDto>> GetFilteredAsync(LogEntryFilterDto filter)
-    // {
-    //     using var connection = _connectionFactory.CreateConnection();
-    //
-    //     var sql = @"
-    //         SELECT l.Id, l.EntityName AS EntryName, l.EntityId AS EntryId,
-    //                u.UserName, u.Role AS UserRole, l.Timestamp
-    //         FROM LogEntries l
-    //         INNER JOIN Users u ON u.Id = l.UserId
-    //         WHERE 1 = 1
-    //     ";
-    //     
-    //     var parameters = new DynamicParameters();
-    //
-    //     if (!string.IsNullOrEmpty(filter.EntryName))
-    //     {
-    //         sql += " AND l.EntityName = @EntryName";
-    //         parameters.Add("EntryName", filter.EntryName);
-    //     }
-    //
-    //     if (!string.IsNullOrEmpty(filter.UserRole))
-    //     {
-    //         sql += " AND u.Role = @UserRole";
-    //         parameters.Add("UserRole", filter.UserRole);
-    //     }
-    //
-    //     if (!string.IsNullOrEmpty(filter.UserNameSearch))
-    //     {
-    //         sql += " AND u.UserName LIKE @UserName";
-    //         parameters.Add("UserName", $"%{filter.UserNameSearch}%");
-    //     }
-    //
-    //     if (filter.From.HasValue)
-    //     {
-    //         sql += " AND l.Timestamp >= @From";
-    //         parameters.Add("From", filter.From.Value);
-    //     }
-    //
-    //     if (filter.To.HasValue)
-    //     {
-    //         sql += " AND l.Timestamp <= @To";
-    //         parameters.Add("To", filter.To.Value);
-    //     }
-    //
-    //     sql += " ORDER BY l.Timestamp DESC";
-    //     sql += " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-    //
-    //     parameters.Add("Offset", (filter.Page - 1) * filter.PageSize);
-    //     parameters.Add("PageSize", filter.PageSize);
-    //
-    //     return await connection.QueryAsync<LogEntryDto>(sql, parameters);
-    // }
-
-    // public async Task<int> CountFilteredAsync(LogEntryFilterDto filter)
-    // {
-    //     using var connection = _connectionFactory.CreateConnection();
-    //
-    //     var sql = @"
-    //         SELECT COUNT(*) 
-    //         FROM LogEntries l
-    //         INNER JOIN Users u ON u.Id = l.UserId
-    //         WHERE 1 = 1
-    //     ";
-    //
-    //     var parameters = new DynamicParameters();
-    //
-    //     if (!string.IsNullOrEmpty(filter.EntryName))
-    //     {
-    //         sql += " AND l.EntityName = @EntryName";
-    //         parameters.Add("EntryName", filter.EntryName);
-    //     }
-    //
-    //     if (!string.IsNullOrEmpty(filter.UserRole))
-    //     {
-    //         sql += " AND u.Role = @UserRole";
-    //         parameters.Add("UserRole", filter.UserRole);
-    //     }
-    //
-    //     if (!string.IsNullOrEmpty(filter.UserNameSearch))
-    //     {
-    //         sql += " AND u.UserName LIKE @UserName";
-    //         parameters.Add("UserName", $"%{filter.UserNameSearch}%");
-    //     }
-    //
-    //     if (filter.From.HasValue)
-    //     {
-    //         sql += " AND l.Timestamp >= @From";
-    //         parameters.Add("From", filter.From.Value);
-    //     }
-    //
-    //     if (filter.To.HasValue)
-    //     {
-    //         sql += " AND l.Timestamp <= @To";
-    //         parameters.Add("To", filter.To.Value);
-    //     }
-    //
-    //     return await connection.ExecuteScalarAsync<int>(sql, parameters);
-    // }
 }

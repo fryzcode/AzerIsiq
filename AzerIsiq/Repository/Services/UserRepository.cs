@@ -35,7 +35,6 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
-
     public async Task AddUserRoleAsync(int userId, int roleId)
     {
         _context.UserRoles.Add(new UserRole { UserId = userId, RoleId = roleId });
@@ -137,5 +136,4 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         return await query.CountAsync();
     }
-
 }

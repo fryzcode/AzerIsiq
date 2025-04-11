@@ -40,15 +40,4 @@ public class LoggingService:ILoggingService
 
         await _loggerRepository.LogAsync(logEntry);
     }
-
-    // public async Task LogActionAsync(string action, string entityName, int entityId)
-    // {
-    //     await _logger.LogAsync(new LogEntry()
-    //     {
-    //         Action = action,
-    //         EntityName = entityName,
-    //         EntityId = entityId,
-    //         UserId = _authService.GetCurrentUserId()
-    //     });
-    // }
 }

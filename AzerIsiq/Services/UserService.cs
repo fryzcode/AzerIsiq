@@ -31,4 +31,10 @@ public class UserService : IUserService
             PageSize = parameters.PageSize
         };
     }
+    
+    public async Task<UserDto?> GetUserByIdAsync(int id)
+    {
+        var user = await _userRepository.GetUserWithRolesAsync(id);
+        return user == null ? null : _mapper.Map<UserDto>(user);
+    }
 }

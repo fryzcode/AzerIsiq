@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AzerIsiq.Repository.Services
 {
-    public class RoleRepository : IRoleRepository
+    public class RoleRepository : GenericRepository<Role>, IRoleRepository
     {
-        private readonly AppDbContext _context;
-
-        public RoleRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        public RoleRepository(AppDbContext context) : base(context) { }
 
         public async Task<Role?> GetByRoleNameAsync(string roleName)
         {

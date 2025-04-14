@@ -156,4 +156,15 @@ public class LoggerRepository : ILoggerRepository
 
         return await connection.ExecuteScalarAsync<int>(sql, parameters);
     }
+    
+    public async Task<IEnumerable<string>> GetAllEntityNamesAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var sql = @"SELECT DISTINCT EntityName FROM LogEntries ORDER BY EntityName";
+    
+        var result = await connection.QueryAsync<string>(sql);
+        return result;
+    }
+
 }

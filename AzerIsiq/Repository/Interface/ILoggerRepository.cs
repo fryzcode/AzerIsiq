@@ -8,4 +8,5 @@ public interface ILoggerRepository
     Task<IEnumerable<LogEntryDto>> GetFilteredAsync(LogEntryFilterDto filter);
     Task<int> CountFilteredAsync(LogEntryFilterDto filter);
     Task LogAsync(LogEntry logEntry);
+    Task<IEnumerable<string>> GetAllEntityNamesAsync();
 }

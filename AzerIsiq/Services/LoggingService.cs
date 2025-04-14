@@ -40,4 +40,8 @@ public class LoggingService:ILoggingService
 
         await _loggerRepository.LogAsync(logEntry);
     }
+    public async Task<IEnumerable<string>> GetAllEntityNamesAsync()
+    {
+        return await _loggerRepository.GetAllEntityNamesAsync();
+    }
 }

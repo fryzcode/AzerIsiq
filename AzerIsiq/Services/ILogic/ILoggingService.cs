@@ -7,5 +7,5 @@ public interface ILoggingService
     Task<IEnumerable<LogEntryDto>> GetLogsAsync(LogEntryFilterDto filter);
     Task<int> CountLogsAsync(LogEntryFilterDto filter);
     Task LogActionAsync(string action, string entityName, int entityId);
-    // Task LogAsync(LogEntryCreateDto dto);
+    Task<IEnumerable<string>> GetAllEntityNamesAsync();
 }

@@ -24,4 +24,11 @@ public class LogController : ControllerBase
         var totalCount = await _logService.CountLogsAsync(filter);
         return Ok(new { data = logs, total = totalCount });
     }
+
+    [HttpGet("entities")]
+    public async Task<IActionResult> GetEntity()
+    {
+        var entities = await _logService.GetAllEntityNamesAsync();
+        return Ok(entities);
+    }
 }

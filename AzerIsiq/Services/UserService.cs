@@ -10,10 +10,12 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
+    private readonly IRoleRepository _roleRepository;
 
-    public UserService(IUserRepository userRepository, IMapper mapper)
+    public UserService(IUserRepository userRepository, IRoleRepository roleRepository, IMapper mapper)
     {
         _userRepository = userRepository;
+        _roleRepository = roleRepository;
         _mapper = mapper;
     }
 
@@ -37,6 +39,12 @@ public class UserService : IUserService
     {
         var user = await _userRepository.GetUserWithRolesAsync(id);
         return user == null ? null : _mapper.Map<UserDto>(user);
+    }
+    
+    public async Task<List<RoleDto>> GetAllRolesAsync()
+    {
+        var roles = await _roleRepository.GetAllAsync();
+        return _mapper.Map<List<RoleDto>>(roles);
     }
     
     public async Task BlockUserAsync(int userId, bool isBlocked)

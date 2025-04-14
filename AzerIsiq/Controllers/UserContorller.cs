@@ -39,4 +39,11 @@ public class UsersController : ControllerBase
         await _userService.BlockUserAsync(dto.UserId, dto.IsBlocked);
         return Ok(new { message = $"User {(dto.IsBlocked ? "blocked" : "unblocked")}" });
     }
+    
+    [HttpGet("roles")]
+    public async Task<ActionResult<RoleDto>> GetUsers()
+    {
+        var result = await _userService.GetAllRolesAsync();
+        return Ok(result);
+    }
 }

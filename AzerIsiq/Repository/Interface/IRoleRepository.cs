@@ -2,7 +2,7 @@
 
 namespace AzerIsiq.Repository.Interface
 {
-    public interface IRoleRepository
+    public interface IRoleRepository : IGenericRepository<Role>
     {
         Task<Role?> GetByRoleNameAsync(string roleName);
     }

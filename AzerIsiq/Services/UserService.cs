@@ -21,15 +21,14 @@ public class UserService : IUserService
 
     public async Task<PagedResultDto<UserListDto>> GetAllUsersAsync(UserQueryParameters parameters)
     {
-        var users = await _userRepository.GetUsersAsync(parameters);
-        var totalCount = await _userRepository.GetUsersCountAsync(parameters);
+        var users = await _userRepository.GetUsersPagedAsync(parameters);
 
-        var userListDtos = _mapper.Map<List<UserListDto>>(users);
+        var userListDtos = _mapper.Map<List<UserListDto>>(users.Items);
 
         return new PagedResultDto<UserListDto>
         {
             Items = userListDtos,
-            TotalCount = totalCount,
+            TotalCount = users.TotalCount,
             Page = parameters.Page,
             PageSize = parameters.PageSize
         };

@@ -88,20 +88,21 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             await _context.SaveChangesAsync();
         }
     }
-    
-    public async Task<List<User>> GetUsersAsync(UserQueryParameters parameters)
+    public async Task<PagedResultDto<User>> GetUsersPagedAsync(UserQueryParameters parameters)
     {
         var query = _context.Users
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
             .AsQueryable();
-
+        
         if (!string.IsNullOrWhiteSpace(parameters.Search))
         {
             var searchLower = parameters.Search.ToLower();
             query = query.Where(u =>
                 u.Email.ToLower().Contains(searchLower) ||
-                u.UserName.ToLower().Contains(searchLower));
+                u.UserName.ToLower().Contains(searchLower) ||
+                u.PhoneNumber.ToLower().Contains(searchLower) ||
+                u.IpAddress.ToLower().Contains(searchLower));
         }
 
         if (!string.IsNullOrWhiteSpace(parameters.Role))
@@ -109,31 +110,31 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             query = query.Where(u =>
                 u.UserRoles.Any(ur => ur.Role.RoleName == parameters.Role));
         }
+
+        if (parameters.IsBlocked.HasValue)
+        {
+            query = query.Where(u => u.IsBlocked == parameters.IsBlocked.Value);
+        }
+
+        if (parameters.CreatedAtFrom.HasValue)
+        {
+            query = query.Where(u => u.CreatedAt >= parameters.CreatedAtFrom.Value);
+        }
+
+        if (parameters.CreatedAtTo.HasValue)
+        {
+            query = query.Where(u => u.CreatedAt <= parameters.CreatedAtTo.Value);
+        }
+        
+        int totalCount = await query.CountAsync();
 
         int skip = (parameters.Page - 1) * parameters.PageSize;
-        query = query.Skip(skip).Take(parameters.PageSize);
+        var items = await query.Skip(skip).Take(parameters.PageSize).ToListAsync();
 
-        return await query.ToListAsync();
-    }
-
-    public async Task<int> GetUsersCountAsync(UserQueryParameters parameters)
-    {
-        var query = _context.Users.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(parameters.Search))
+        return new PagedResultDto<User>
         {
-            var searchLower = parameters.Search.ToLower();
-            query = query.Where(u =>
-                u.Email.ToLower().Contains(searchLower) ||
-                u.UserName.ToLower().Contains(searchLower));
-        }
-
-        if (!string.IsNullOrWhiteSpace(parameters.Role))
-        {
-            query = query.Where(u =>
-                u.UserRoles.Any(ur => ur.Role.RoleName == parameters.Role));
-        }
-
-        return await query.CountAsync();
+            Items = items,
+            TotalCount = totalCount
+        };
     }
 }

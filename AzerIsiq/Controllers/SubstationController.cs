@@ -8,7 +8,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class SubstationController : ControllerBase
 {
     private readonly ISubstationService _substationService;
@@ -19,6 +19,7 @@ public class SubstationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromForm] SubstationDto dto)
     {
         var substation = await _substationService.CreateSubstationAsync(dto);
@@ -48,6 +49,7 @@ public class SubstationController : ControllerBase
     }
     
     [HttpPatch("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id, [FromForm] SubstationDto dto)
     {
         if (dto == null)
@@ -58,6 +60,7 @@ public class SubstationController : ControllerBase
     }
     
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         await _substationService.DeleteSubstationAsync(id);

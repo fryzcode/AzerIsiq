@@ -44,4 +44,9 @@ public class LoggingService:ILoggingService
     {
         return await _loggerRepository.GetAllEntityNamesAsync();
     }
+    
+    public async Task<IEnumerable<LogEntryDto>> GetLogsBySubscriberCodeAsync(string subscriberCode)
+    {
+        return await _loggerRepository.GetLogsBySubscriberCodeAsync(subscriberCode);
+    }
 }

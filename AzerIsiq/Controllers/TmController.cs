@@ -12,7 +12,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class TmController : ControllerBase
 {
     private readonly ITmService _tmService;
@@ -39,6 +39,7 @@ public class TmController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] TmDto dto)
     {
         await _tmDtoValidator.ValidateAndThrowAsync(dto);
@@ -48,6 +49,7 @@ public class TmController : ControllerBase
     }
     
     [HttpPatch("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id, [FromBody] TmDto dto)
     {
         await _tmDtoValidator.ValidateAndThrowAsync(dto);

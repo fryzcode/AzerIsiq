@@ -63,7 +63,7 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid email or password.");
         
         if (user.IsBlocked)
-            throw new ForbiddenException("User is blocked.");
+            throw new ForbiddenException("Your Account is blocked.");
         
         if (user.LastFailedAttempt.HasValue && user.FailedAttempts >= 3)
         {

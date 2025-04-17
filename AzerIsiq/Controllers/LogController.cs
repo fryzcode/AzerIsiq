@@ -31,4 +31,16 @@ public class LogController : ControllerBase
         var entities = await _logService.GetAllEntityNamesAsync();
         return Ok(entities);
     }
+    
+    [HttpGet("by-subscriber-code/{subscriberCode}")]
+    public async Task<IActionResult> GetLogsBySubscriberCode(string subscriberCode)
+    {
+        var logs = await _logService.GetLogsBySubscriberCodeAsync(subscriberCode);
+
+        if (!logs.Any())
+            return NotFound($"Not have log subscriberCode: {subscriberCode}");
+
+        return Ok(logs);
+    }
+
 }

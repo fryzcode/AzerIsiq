@@ -9,7 +9,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -41,7 +41,7 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet("roles")]
-    public async Task<ActionResult<RoleDto>> GetUsers()
+    public async Task<ActionResult<RoleDto>> GetUserRoles()
     {
         var result = await _userService.GetAllRolesAsync();
         return Ok(result);

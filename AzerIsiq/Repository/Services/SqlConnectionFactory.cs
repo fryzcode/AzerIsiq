@@ -16,6 +16,6 @@ public class SqlConnectionFactory : IDbConnectionFactory
 
     public IDbConnection CreateConnection()
     {
-        return new SqlConnection(_configuration.GetConnectionString("DBConnectionL"));
+        return new SqlConnection(_configuration.GetConnectionString("DBConnection"));
     }
 }

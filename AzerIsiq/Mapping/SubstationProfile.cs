@@ -23,7 +23,8 @@ public class SubstationProfile : Profile
         CreateMap<Location, LocationDto>();
         CreateMap<Image, ImageDto>();
 
-        CreateMap<SubstationDto, Substation>();
+        CreateMap<SubstationDto, Substation>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
         CreateMap<Substation, SubstationResponseDto>();
         CreateMap<Substation, SubstationDto>()
             .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.District.RegionId))

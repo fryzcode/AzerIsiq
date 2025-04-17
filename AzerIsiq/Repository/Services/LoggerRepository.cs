@@ -166,5 +166,46 @@ public class LoggerRepository : ILoggerRepository
         var result = await connection.QueryAsync<string>(sql);
         return result;
     }
+    
+    public async Task<IEnumerable<LogEntryDto>> GetLogsBySubscriberCodeAsync(string subscriberCode)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var sql = @"
+        SELECT 
+            l.Id,
+            l.Action,
+            l.EntityId AS EntryId,
+            l.EntityName AS EntryName,
+            l.Timestamp,
+            u.Id AS UserId,
+            u.UserName,
+            STRING_AGG(r.RoleName, ', ') AS UserRole
+        FROM LogEntries l
+        INNER JOIN Users u ON l.UserId = u.Id
+        INNER JOIN UserRoles ur ON u.Id = ur.UserId
+        INNER JOIN Roles r ON ur.RoleId = r.Id
+        INNER JOIN Subscribers s ON l.EntityId = s.Id
+        WHERE l.EntityName = 'Subscriber' AND s.SubscriberCode = @SubscriberCode
+        GROUP BY l.Id, l.Action, l.EntityId, l.EntityName, l.Timestamp, u.Id, u.UserName
+        ORDER BY l.Timestamp DESC
+    ";
+
+        var result = await connection.QueryAsync(sql, new { SubscriberCode = subscriberCode });
+
+        return result.Select(row => new LogEntryDto
+        {
+            Id = row.Id,
+            Action = row.Action,
+            EntryId = row.EntryId,
+            EntryName = row.EntryName,
+            Timestamp = TimeZoneInfo.ConvertTimeToUtc(row.Timestamp),
+            UserId = row.UserId,
+            UserName = row.UserName,
+            UserRoles = (row.UserRole as string)?.Split(", ").ToList() ?? new List<string>()
+        });
+    }
+
+    
 
 }

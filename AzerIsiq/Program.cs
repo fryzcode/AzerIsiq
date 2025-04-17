@@ -1,13 +1,9 @@
 using AzerIsiq.Extensions;
 using AzerIsiq.Extensions.Exceptions;
+using AzerIsiq.Extensions.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-dynamic a = 5.ToString();
-dynamic b = 10;
-
-Console.WriteLine(a + b);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,13 +22,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var kestrelPort = builder.Configuration.GetValue<int>("Kestrel:EndpointPort");
+
 builder.WebHost.ConfigureKestrel(options =>
 {
-    //For Docker
-    // options.ListenAnyIP(5252); 
-    options.ListenAnyIP(5297);
-    // options.ListenAnyIP(6000);
+    options.ListenAnyIP(kestrelPort);
 });
+
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"DBConnection: {builder.Configuration.GetConnectionString("DBConnection")}");
+Console.WriteLine($"Kestrel Port: {kestrelPort}");
 
 var app = builder.Build();
 
@@ -49,6 +48,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
+app.UseMiddleware<BlockedUserMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.BackgroundTasks;
 using AzerIsiq.Extensions.Mapping;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
@@ -69,6 +70,8 @@ namespace AzerIsiq.Extensions
             services.AddScoped<OtpService>();
             services.AddScoped<JwtService>();
             
+            services.AddHostedService<FailedAttemptsResetTask>();
+            
             services.AddAutoMapper(typeof(Program));
 
             services.AddHttpContextAccessor();
@@ -95,7 +98,7 @@ namespace AzerIsiq.Extensions
         public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DBConnectionL")));
+                options.UseSqlServer(configuration.GetConnectionString("DBConnection")));
 
             return services;
         }

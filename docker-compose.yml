@@ -6,7 +6,8 @@ services:
       dockerfile: AzerIsiq/Dockerfile
     container_name: azerisiq
     environment:
-      ConnectionStrings__DefaultConnection: "Server=sql;Database=AzerIsiqDB;User Id=SA;Password=MyStrongPass123;Encrypt=true;TrustServerCertificate=True"
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sql;Database=AzerIsiqDB;User Id=SA;Password=MyStrongPass123;Encrypt=true;TrustServerCertificate=True
     ports:
       - "5252:5252"
     networks:

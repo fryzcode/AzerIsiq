@@ -16,4 +16,5 @@ public interface IUserRepository : IGenericRepository<User>
     Task<User?> GetByResetTokenAsync(string token);
     Task UpdatePasswordAsync(int userId, string newPasswordHash);
     Task<PagedResultDto<User>> GetUsersPagedAsync(UserQueryParameters parameters);
+    Task ResetFailedAttemptsAsync(CancellationToken cancellationToken);
 }

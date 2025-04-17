@@ -9,7 +9,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class RegionController : ControllerBase
 {
     private readonly IRegionService _regionService;

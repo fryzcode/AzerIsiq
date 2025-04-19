@@ -69,6 +69,12 @@ namespace AzerIsiq.Data
                 .HasForeignKey(s => s.LocationId)
                 .OnDelete(DeleteBehavior.SetNull);
             
+            modelBuilder.Entity<Tm>()
+                .HasOne(s => s.Location)
+                .WithMany(l => l.Tms)
+                .HasForeignKey(s => s.LocationId)
+                .OnDelete(DeleteBehavior.SetNull);
+            
             modelBuilder.Entity<LogEntry>()
                 .HasOne<User>()
                 .WithMany()

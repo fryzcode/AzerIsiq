@@ -8,4 +8,5 @@ public interface IUserService
     Task<UserDto?> GetUserByIdAsync(int id);
     Task BlockUserAsync(int userId, bool isBlocked);
     Task<List<RoleDto>> GetAllRolesAsync();
+    Task AssignRoleToUserAsync(AssignRoleDto dto);
 }

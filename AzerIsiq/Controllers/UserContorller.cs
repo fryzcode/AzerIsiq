@@ -46,4 +46,11 @@ public class UsersController : ControllerBase
         var result = await _userService.GetAllRolesAsync();
         return Ok(result);
     }
+    
+    [HttpPost("assign-role")]
+    public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto dto)
+    {
+        await _userService.AssignRoleToUserAsync(dto);
+        return Ok(new { message = "Role assigned successfully" });
+    }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.Exceptions;
+using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services.ILogic;
 
@@ -55,4 +56,26 @@ public class UserService : IUserService
 
         await _userRepository.UpdateAsync(user);
     }
+    
+    public async Task AssignRoleToUserAsync(AssignRoleDto dto)
+    {
+        var user = await _userRepository.GetUserWithRolesAsync(dto.UserId)
+                   ?? throw new Exception("User not found");
+
+        var role = await _userRepository.GetRoleByNameAsync(dto.RoleName)
+                   ?? throw new Exception("Role not found");
+
+        var alreadyAssigned = user.UserRoles.Any(ur => ur.RoleId == role.Id);
+        if (alreadyAssigned)
+            throw new Exception("Role already assigned to user");
+
+        var userRole = new UserRole()
+        {
+            UserId = user.Id,
+            RoleId = role.Id
+        };
+
+        await _userRepository.AddUserRoleAsync(userRole);
+    }
+
 }

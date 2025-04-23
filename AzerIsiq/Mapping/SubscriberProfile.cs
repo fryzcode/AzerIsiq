@@ -15,5 +15,23 @@ public class SubscriberProfile : Profile
             .ForMember(dest => dest.DistrictName, opt => opt.MapFrom(src => src.District.Name ?? "N/A"))
             .ForMember(dest => dest.TerritoryName, opt => opt.MapFrom(src => src.Territory.Name ?? "N/A"))
             .ForMember(dest => dest.StreetName, opt => opt.MapFrom(src => src.Street.Name ?? "N/A"));
+        
+        CreateMap<Subscriber, SubscriberProfileDto>()
+            .ForMember(dest => dest.FullName,
+                opt => opt.MapFrom(src => $"{src.Name} {src.Surname} {src.Patronymic}"))
+            .ForMember(dest => dest.PopulationStatus,
+                opt => opt.MapFrom(src => src.PopulationStatus.ToString()))
+            .ForMember(dest => dest.Region,
+                opt => opt.MapFrom(src => src.Region!.Name))
+            .ForMember(dest => dest.District,
+                opt => opt.MapFrom(src => src.District!.Name))
+            .ForMember(dest => dest.Territory,
+                opt => opt.MapFrom(src => src.Territory != null ? src.Territory.Name : null))
+            .ForMember(dest => dest.Street,
+                opt => opt.MapFrom(src => src.Street != null ? src.Street.Name : null))
+            .ForMember(dest => dest.Address,
+                opt => opt.MapFrom(src => $"{src.Region!.Name}, {src.District!.Name}, {src.Street.Name ?? ""}, {src.Building}, {src.Apartment}"))
+            .ForMember(dest => dest.RequestStatus,
+                opt => opt.MapFrom(src => src.Status == 1 ? "Aktiv" : "Passiv"));
     }
 }

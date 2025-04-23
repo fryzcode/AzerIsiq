@@ -147,4 +147,14 @@ public class SubscriberRepository : GenericRepository<Subscriber>, ISubscriberRe
     {
         return await _context.Subscribers.AnyAsync(s => s.FinCode == finCode);
     }
+    public async Task<List<Subscriber>> GetByUserIdAsync(int userId)
+    {
+        return await _context.Subscribers
+            .Where(x => x.UserId == userId)
+            .Include(x => x.Region)
+            .Include(x => x.District)
+            .Include(x => x.Territory)
+            .Include(x => x.Street)
+            .ToListAsync();
+    }
 }

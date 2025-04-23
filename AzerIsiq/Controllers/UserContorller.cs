@@ -9,7 +9,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -18,8 +18,8 @@ public class UsersController : ControllerBase
     {
         _userService = userService;
     }
-
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<PagedResultDto<UserListDto>>> GetUsers([FromQuery] UserQueryParameters parameters)
     {
         var result = await _userService.GetAllUsersAsync(parameters);
@@ -32,21 +32,21 @@ public class UsersController : ControllerBase
         var user = await _userService.GetUserByIdAsync(id);
         return Ok(user);
     }
-    
+    [Authorize(Roles = "Admin")]
     [HttpPost("block")]
     public async Task<IActionResult> BlockUser([FromBody] BlockUserDto dto)
     {
         await _userService.BlockUserAsync(dto.UserId, dto.IsBlocked);
         return Ok(new { message = $"User {(dto.IsBlocked ? "blocked" : "unblocked")}" });
     }
-    
+    [Authorize(Roles = "Admin")]
     [HttpGet("roles")]
     public async Task<ActionResult<RoleDto>> GetUserRoles()
     {
         var result = await _userService.GetAllRolesAsync();
         return Ok(result);
     }
-    
+    [Authorize(Roles = "Admin")]
     [HttpPost("assign-role")]
     public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto dto)
     {

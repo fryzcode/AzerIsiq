@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using AzerIsiq.Dtos;
 using AzerIsiq.Services;
 using AzerIsiq.Services.ILogic;
@@ -87,5 +88,15 @@ public class SubscriberController : ControllerBase
     {
         var result = await _subscriberService.GetSubscribersFilteredAsync(request, filter);
         return Ok(result);
+    }
+    
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<List<SubscriberProfileDto>>> GetMyProfile()
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var profiles = await _subscriberService.GetProfilesAsync(userId);
+        return Ok(profiles); 
     }
 }

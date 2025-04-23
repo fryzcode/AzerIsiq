@@ -4,6 +4,7 @@ using AzerIsiq.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzerIsiq.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423065514_UpdateUser")]
+    partial class UpdateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -366,7 +369,9 @@ namespace AzerIsiq.Migrations
 
                     b.HasIndex("TmId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Subscribers");
                 });
@@ -621,8 +626,8 @@ namespace AzerIsiq.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("AzerIsiq.Models.User", "User")
-                        .WithMany("Subscribers")
-                        .HasForeignKey("UserId");
+                        .WithOne("Subscriber")
+                        .HasForeignKey("AzerIsiq.Models.Subscriber", "UserId");
 
                     b.Navigation("Counter");
 
@@ -750,7 +755,7 @@ namespace AzerIsiq.Migrations
                 {
                     b.Navigation("OtpCodes");
 
-                    b.Navigation("Subscribers");
+                    b.Navigation("Subscriber");
 
                     b.Navigation("UserRoles");
                 });

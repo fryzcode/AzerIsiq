@@ -157,6 +157,11 @@ namespace AzerIsiq.Data
                 .WithMany(t => t.Streets)
                 .HasForeignKey(s => s.TerritoryId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<Subscriber>()
+                .HasOne(s => s.User)
+                .WithMany(u => u.Subscribers)
+                .HasForeignKey(s => s.UserId);
         }
     }
 }

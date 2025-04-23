@@ -17,6 +17,7 @@ public class SubscriberService : ISubscriberService
     private readonly IMapper _mapper;
     private readonly ISubscriberCodeGenerator _codeGenerator;
     private readonly ILoggingService _loggingService;
+    private readonly IAuthService _authService;
     
     public SubscriberService(
         ISubscriberRepository subscriberRepository, 
@@ -24,7 +25,8 @@ public class SubscriberService : ISubscriberService
         ITmService tmService, 
         IMapper mapper, 
         ISubscriberCodeGenerator codeGenerator,
-        ILoggingService loggingService
+        ILoggingService loggingService, 
+        IAuthService authService
         )
     {
         _subscriberRepository = subscriberRepository;
@@ -33,6 +35,7 @@ public class SubscriberService : ISubscriberService
         _mapper = mapper;
         _codeGenerator = codeGenerator;
         _loggingService = loggingService;
+        _authService = authService;
     }
     
     public async Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto)
@@ -50,6 +53,7 @@ public class SubscriberService : ISubscriberService
         subscriber.Building = dto.Building.ToLower();
         subscriber.Apartment = dto.Apartment.ToLower();
         subscriber.Ats = atsCode;
+        subscriber.UserId = _authService.GetCurrentUserId();
         
         var result = await _subscriberRepository.CreateAsync(subscriber);
 
@@ -152,4 +156,14 @@ public class SubscriberService : ISubscriberService
         return _mapper.Map<SubscriberDto>(sb);
     }
 
+    public async Task<List<SubscriberProfileDto>> GetProfilesAsync(int userId)
+    {
+        var subscribers = await _subscriberRepository.GetByUserIdAsync(userId);
+        if (subscribers == null || !subscribers.Any())
+        {
+            throw new NotFoundException("Abunə tapılmadı");
+        }
+
+        return _mapper.Map<List<SubscriberProfileDto>>(subscribers);
+    }
 }

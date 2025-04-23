@@ -25,6 +25,7 @@ namespace AzerIsiq.Models
         public DateTime? LastFailedAttempt { get; set; } 
         public List<OtpCode> OtpCodes { get; set; } = new();
         public bool IsBlocked { get; set; } = false;
+        public List<Subscriber> Subscribers { get; set; } = new();
     }
 
 }

@@ -40,11 +40,24 @@ public class SubscriberService : ISubscriberService
     
     public async Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto)
     {
-        var checkFin = await _subscriberRepository.ExistsBySubscriberFinAsync(dto.FinCode);
+        var userId = _authService.GetCurrentUserId();
+        var requests = await _subscriberRepository.GetRequestsByFinAsync(dto.FinCode);
         
-        if (checkFin)
+        if (requests.Count >= 3)
         {
-            throw new Exception($"SubscriberCode {dto.FinCode} already exists.");
+            var firstRequest = requests.OrderBy(r => r.CreatedAt).FirstOrDefault();
+        
+            if (firstRequest != null && (DateTime.UtcNow - firstRequest.CreatedAt).TotalDays < 30)
+            {
+                throw new Exception($"Requests with FIN {dto.FinCode} exceed the limit");
+            }
+        }
+        
+        var userRequests = await _subscriberRepository.GetUserRequestsInLastMonthAsync(userId);
+
+        if (userRequests.Count >= 3)
+        {
+            throw new Exception("You have reached the request limit (3 per month).");
         }
         
         var atsCode = await _subscriberRepository.GenerateUniqueAtsAsync();

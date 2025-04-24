@@ -10,4 +10,6 @@ public interface ISubscriberRepository : IGenericRepository<Subscriber>
     Task<bool> ExistsBySubscriberCodeAsync(string subscriberCode);
     public Task<bool> ExistsBySubscriberFinAsync(string finCode);
     Task<List<Subscriber>> GetByUserIdAsync(int userId);
+    Task<List<Subscriber>> GetRequestsByFinAsync(string finCode);
+    Task<List<Subscriber>> GetUserRequestsInLastMonthAsync(int userId);
 }

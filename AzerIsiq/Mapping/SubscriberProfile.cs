@@ -1,5 +1,6 @@
 using AutoMapper;
 using AzerIsiq.Dtos;
+using AzerIsiq.Extensions.Helpers;
 using AzerIsiq.Models;
 
 namespace AzerIsiq.Extensions.Mapping;
@@ -32,6 +33,6 @@ public class SubscriberProfile : Profile
             .ForMember(dest => dest.Address,
                 opt => opt.MapFrom(src => $"{src.Region!.Name}, {src.District!.Name}, {src.Street.Name ?? ""}, {src.Building}, {src.Apartment}"))
             .ForMember(dest => dest.RequestStatus,
-                opt => opt.MapFrom(src => src.Status == 1 ? "Aktiv" : "Passiv"));
+                opt => opt.MapFrom(src => src.Status));
     }
 }

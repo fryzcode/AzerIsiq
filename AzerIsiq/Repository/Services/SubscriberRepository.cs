@@ -147,6 +147,20 @@ public class SubscriberRepository : GenericRepository<Subscriber>, ISubscriberRe
     {
         return await _context.Subscribers.AnyAsync(s => s.FinCode == finCode);
     }
+    public async Task<List<Subscriber>> GetRequestsByFinAsync(string finCode)
+    {
+        return await _context.Subscribers
+            .Where(s => s.FinCode == finCode)
+            .ToListAsync();
+    }
+    
+    public async Task<List<Subscriber>> GetUserRequestsInLastMonthAsync(int userId)
+    {
+        return await _context.Subscribers
+            .Where(s => s.UserId == userId && s.CreatedAt >= DateTime.UtcNow.AddDays(-30))
+            .ToListAsync();
+    }
+
     public async Task<List<Subscriber>> GetByUserIdAsync(int userId)
     {
         return await _context.Subscribers

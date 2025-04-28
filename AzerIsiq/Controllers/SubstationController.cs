@@ -43,6 +43,7 @@ public class SubstationController : ControllerBase
     }
     
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetById(int id)
     {
         var sb = await _substationService.GetSubstationByIdAsync(id);
@@ -70,6 +71,7 @@ public class SubstationController : ControllerBase
     }
     
     [HttpGet("filtered")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetSubstationsByFilters(
         [FromQuery] PagedRequestDto request, 
         [FromQuery] int? regionId, 

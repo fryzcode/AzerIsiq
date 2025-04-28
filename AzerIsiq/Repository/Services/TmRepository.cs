@@ -46,4 +46,13 @@ public class TmRepository : GenericRepository<Tm>, ITmRepository
             PageSize = pageSize
         };
     }
+    public async Task<Tm?> GetByIdWithIncludesAsync(int id)
+    {
+        return await _context.Tms.Include(t => t.Substation)
+            .ThenInclude(s => s.District)
+            .ThenInclude(d => d.Region)
+            .Include(s => s.Location)
+            .Include(s => s.Images)
+            .FirstOrDefaultAsync(s => s.Id == id);
+    }
 }

@@ -5,7 +5,7 @@ namespace AzerIsiq.Services;
 
 public interface ITmService
 {
-    Task<Tm> GetTmByIdAsync(int id);
+    Task<TmGetDto> GetTmByIdAsync(int id);
     Task<PagedResultDto<TmDtoPaged>> GetTmsByFiltersAsync(PagedRequestDto request, int? regionId, int? districtId, int? substationId);
     Task<PagedResultDto<TmResponeDto>> GetTmAsync(int page, int pageSize);
     Task<Tm> CreateTmAsync(TmDto dto);

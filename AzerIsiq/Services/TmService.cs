@@ -3,6 +3,7 @@ using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Services.ILogic;
@@ -17,6 +18,8 @@ public class TmService : ITmService
     private readonly ITmRepository _tmRepository;
     private readonly ILocationService _locationService;
     private readonly ILoggingService _loggingService;
+    private readonly IMapper _mapper;
+
 
     public TmService(
         ISubstationRepository substationRepository,
@@ -24,7 +27,8 @@ public class TmService : ITmService
         IDistrictRepository districtRepository,
         ITmRepository tmRepository,
         ILocationService locationService,
-        ILoggingService loggingService)
+        ILoggingService loggingService,
+        IMapper mapper)
     {
         _substationRepository = substationRepository;
         _regionRepository = regionRepository;
@@ -32,14 +36,15 @@ public class TmService : ITmService
         _tmRepository = tmRepository;
         _locationService = locationService;
         _loggingService = loggingService;
+        _mapper = mapper;
     }
 
-    public async Task<Tm> GetTmByIdAsync(int id)
+    public async Task<TmGetDto> GetTmByIdAsync(int id)
     {
-        var tm = await _tmRepository.GetByIdAsync(id)
-                   ?? throw new NotFoundException($"No tm found by ID {id}.");
-        
-        return tm;
+        var tm = await _tmRepository.GetByIdWithIncludesAsync(id)
+                 ?? throw new NotFoundException($"No TM found by ID {id}.");
+
+        return _mapper.Map<TmGetDto>(tm);
     }
     public async Task<PagedResultDto<TmDtoPaged>> GetTmsByFiltersAsync(PagedRequestDto request, int? regionId, int? districtId, int? substationId)
     {

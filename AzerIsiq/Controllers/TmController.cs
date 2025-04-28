@@ -12,7 +12,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+// [Authorize]
 public class TmController : ControllerBase
 {
     private readonly ITmService _tmService;
@@ -33,11 +33,11 @@ public class TmController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin,Operator")]
+    // [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetById(int id)
     {
         var tm = await _tmService.GetTmByIdAsync(id);
-        return Ok(new { Id = tm.Id, Name = tm.Name });
+        return Ok(tm);
     }
     
     [HttpPost]

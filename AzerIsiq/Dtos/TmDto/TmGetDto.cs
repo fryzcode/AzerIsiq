@@ -1,11 +1,11 @@
 namespace AzerIsiq.Dtos;
 
-public class SubstationGetDto
+public class TmGetDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public DistrictDto District { get; set; }
+    
+    public SubstationTmDto Substation { get; set; }
     public LocationDto? Location { get; set; }
     public List<ImageDto> Images { get; set; }
 }
-

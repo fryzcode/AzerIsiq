@@ -34,7 +34,7 @@ public class SubscriberController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetById(int id)
     {
         var sb = await _subscriberService.GetSubscriberByIdAsync(id);
@@ -69,7 +69,7 @@ public class SubscriberController : ControllerBase
     }
     
     [HttpPost("sb-apply")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> ApplySubscriberContract(int id)
     {
         var (isConfirmed, subscriber) = await _subscriberService.ApplySubscriberContractAsync(id);
@@ -82,7 +82,7 @@ public class SubscriberController : ControllerBase
         return Ok(new { Message = "Subscriber successfully confirmed"});
     }
     [HttpGet("filtered")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetSubscriberByFilters(
         [FromQuery] PagedRequestDto request, [FromQuery] SubscriberFilterDto filter)
     {

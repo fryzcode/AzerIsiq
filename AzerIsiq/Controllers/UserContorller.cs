@@ -47,10 +47,10 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
     [Authorize(Roles = "Admin")]
-    [HttpPost("assign-role")]
-    public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto dto)
+    [HttpPost("assign-roles")]
+    public async Task<IActionResult> AssignRoles([FromBody] AssignRoleDto dto)
     {
-        await _userService.AssignRoleToUserAsync(dto);
-        return Ok(new { message = "Role assigned successfully" });
+        await _userService.AssignRolesToUserAsync(dto);
+        return Ok(new { message = "Roles updated successfully" });
     }
 }

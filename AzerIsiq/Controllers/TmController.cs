@@ -25,6 +25,7 @@ public class TmController : ControllerBase
     }
 
     [HttpGet("paged")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetRegions([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await _tmService.GetTmAsync(page, pageSize);
@@ -32,6 +33,7 @@ public class TmController : ControllerBase
     }
     
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetById(int id)
     {
         var tm = await _tmService.GetTmByIdAsync(id);
@@ -65,6 +67,7 @@ public class TmController : ControllerBase
     }
     
     [HttpGet("filtered")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetTmsByFilters(
         [FromQuery] PagedRequestDto request, 
         [FromQuery] int? regionId, 

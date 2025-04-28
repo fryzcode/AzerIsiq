@@ -57,25 +57,36 @@ public class UserService : IUserService
         await _userRepository.UpdateAsync(user);
     }
     
-    public async Task AssignRoleToUserAsync(AssignRoleDto dto)
+    public async Task AssignRolesToUserAsync(AssignRoleDto dto)
     {
         var user = await _userRepository.GetUserWithRolesAsync(dto.UserId)
                    ?? throw new Exception("User not found");
 
-        var role = await _userRepository.GetRoleByNameAsync(dto.RoleName)
-                   ?? throw new Exception("Role not found");
+        var allRoles = await _userRepository.GetRolesByNamesAsync(dto.RoleNames);
+        if (allRoles.Count != dto.RoleNames.Count)
+            throw new Exception("One or more roles not found");
 
-        var alreadyAssigned = user.UserRoles.Any(ur => ur.RoleId == role.Id);
-        if (alreadyAssigned)
-            throw new Exception("Role already assigned to user");
+        var currentRoleIds = user.UserRoles.Select(ur => ur.RoleId).ToList();
+        var selectedRoleIds = allRoles.Select(r => r.Id).ToList();
 
-        var userRole = new UserRole()
+        var rolesToAdd = selectedRoleIds.Except(currentRoleIds).ToList();
+
+        var rolesToRemove = currentRoleIds.Except(selectedRoleIds).ToList();
+
+        foreach (var roleId in rolesToAdd)
         {
-            UserId = user.Id,
-            RoleId = role.Id
-        };
+            var userRole = new UserRole
+            {
+                UserId = user.Id,
+                RoleId = roleId
+            };
+            await _userRepository.AddUserRoleAsync(userRole);
+        }
 
-        await _userRepository.AddUserRoleAsync(userRole);
+        foreach (var roleId in rolesToRemove)
+        {
+            await _userRepository.RemoveUserRoleAsync(user.Id, roleId);
+        }
     }
 
 }

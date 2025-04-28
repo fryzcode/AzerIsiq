@@ -7,7 +7,7 @@ namespace AzerIsiq.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Operator")]
 public class LogController : ControllerBase
 {
     private readonly ILoggingService _logService;
@@ -16,7 +16,6 @@ public class LogController : ControllerBase
     {
         _logService = logService;
     }
-
     [HttpGet("filtered")]
     public async Task<IActionResult> GetFiltered([FromQuery] LogEntryFilterDto filter)
     {
@@ -24,14 +23,12 @@ public class LogController : ControllerBase
         var totalCount = await _logService.CountLogsAsync(filter);
         return Ok(new { data = logs, total = totalCount });
     }
-
     [HttpGet("entities")]
     public async Task<IActionResult> GetEntity()
     {
         var entities = await _logService.GetAllEntityNamesAsync();
         return Ok(entities);
     }
-    
     [HttpGet("by-subscriber-code/{subscriberCode}")]
     public async Task<IActionResult> GetLogsBySubscriberCode(string subscriberCode)
     {

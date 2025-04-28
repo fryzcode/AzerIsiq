@@ -178,14 +178,29 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         await _context.SaveChangesAsync(cancellationToken);
     }
-
-    public async Task<Role?> GetRoleByNameAsync(string roleName)
+    
+    public async Task<List<Role>> GetRolesByNamesAsync(List<string> roleNames)
     {
-        return await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == roleName);
+        return await _context.Roles
+            .Where(r => roleNames.Contains(r.RoleName))
+            .ToListAsync();
     }
+    
     public async Task AddUserRoleAsync(UserRole userRole)
     {
         _context.UserRoles.Add(userRole);
         await _context.SaveChangesAsync();
+    }
+    
+    public async Task RemoveUserRoleAsync(int userId, int roleId)
+    {
+        var userRole = await _context.UserRoles
+            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId);
+
+        if (userRole != null)
+        {
+            _context.UserRoles.Remove(userRole);
+            await _context.SaveChangesAsync();
+        }
     }
 }

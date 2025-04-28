@@ -168,7 +168,6 @@ public class SubscriberService : ISubscriberService
 
         return _mapper.Map<SubscriberDto>(sb);
     }
-
     public async Task<List<SubscriberProfileDto>> GetProfilesAsync(int userId)
     {
         var subscribers = await _subscriberRepository.GetByUserIdAsync(userId);

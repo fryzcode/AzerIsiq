@@ -27,6 +27,7 @@ public class SubstationController : ControllerBase
     }
     
     [HttpGet("paged")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetSubstations([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await _substationService.GetSubstationAsync(page, pageSize);
@@ -34,6 +35,7 @@ public class SubstationController : ControllerBase
     }
     
     [HttpGet("by-district/{districtId}")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetSubstationsByDistrict(int districtId, [FromQuery] PagedRequestDto request)
     {
         var result = await _substationService.GetSubstationByDistrictAsync(request, districtId);

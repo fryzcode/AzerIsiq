@@ -1,6 +1,7 @@
 using AzerIsiq.Data;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace AzerIsiq.Repository.Services;
 
@@ -10,5 +11,18 @@ public class CounterRepository: GenericRepository<Counter>, ICounterRepository
     public CounterRepository(AppDbContext context) : base(context)
     {
         _context = context;
+    }
+    
+    public async Task<Counter?> GetBySubscriberIdAsync(int subscriberId)
+    {
+        return await _context.Counters
+            .FirstOrDefaultAsync(c => c.SubscriberId == subscriberId);
+    }
+
+    public async Task<List<Counter>> GetAllBySubscriberIdAsync(int subscriberId)
+    {
+        return await _context.Counters
+            .Where(c => c.SubscriberId == subscriberId)
+            .ToListAsync();
     }
 }

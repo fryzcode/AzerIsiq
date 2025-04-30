@@ -78,4 +78,12 @@ public class TmController : ControllerBase
         return Ok(result);
     }
     
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _tmService.DeleteTmAsync(id);
+        return Ok(new { message = "Tm successfully deleted" });
+    }
+    
 }

@@ -159,4 +159,5 @@ public class TmService : ITmService
         if (substation == null || substation.DistrictId != dto.DistrictId)
             throw new Exception("SubstationDto not found or does not belong to the selected district");
     }
+    
 }

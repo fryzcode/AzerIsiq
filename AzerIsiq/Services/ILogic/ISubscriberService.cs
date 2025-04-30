@@ -14,5 +14,6 @@ public interface ISubscriberService
     Task<PagedResultDto<SubscriberDto>> GetSubscribersFilteredAsync(PagedRequestDto request,
         SubscriberFilterDto dtoFilter);
     Task<List<SubscriberProfileDto>> GetProfilesAsync(int userId);
-    
+    Task<SubscriberDebtDto> GetDebtBySubscriberCodeAsync(string subscriberCode);
+    Task<Subscriber> UpdateCounterForSubscriberAsync(int id, CounterDto dto);
 }

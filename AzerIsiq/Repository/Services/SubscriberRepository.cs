@@ -171,4 +171,14 @@ public class SubscriberRepository : GenericRepository<Subscriber>, ISubscriberRe
             .Include(x => x.Street)
             .ToListAsync();
     }
+    
+    public async Task<Subscriber?> GetWithCountersByCodeAsync(string subscriberCode)
+    {
+        return await _context.Subscribers
+            .Include(x => x.Counters)
+            .FirstOrDefaultAsync(x => x.SubscriberCode == subscriberCode);
+    }
+    
+
+
 }

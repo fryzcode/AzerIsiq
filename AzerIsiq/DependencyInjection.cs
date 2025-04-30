@@ -71,6 +71,7 @@ namespace AzerIsiq.Extensions
             services.AddScoped<JwtService>();
             
             services.AddHostedService<FailedAttemptsResetTask>();
+            services.AddHostedService<SubscriberDebtService>();
             
             services.AddAutoMapper(typeof(Program));
 

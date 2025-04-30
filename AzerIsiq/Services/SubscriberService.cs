@@ -18,6 +18,7 @@ public class SubscriberService : ISubscriberService
     private readonly ISubscriberCodeGenerator _codeGenerator;
     private readonly ILoggingService _loggingService;
     private readonly IAuthService _authService;
+    private readonly ICounterRepository _counterRepository;
     
     public SubscriberService(
         ISubscriberRepository subscriberRepository, 
@@ -26,7 +27,8 @@ public class SubscriberService : ISubscriberService
         IMapper mapper, 
         ISubscriberCodeGenerator codeGenerator,
         ILoggingService loggingService, 
-        IAuthService authService
+        IAuthService authService,
+        ICounterRepository counterRepository
         )
     {
         _subscriberRepository = subscriberRepository;
@@ -36,6 +38,7 @@ public class SubscriberService : ISubscriberService
         _codeGenerator = codeGenerator;
         _loggingService = loggingService;
         _authService = authService;
+        _counterRepository = counterRepository;
     }
     
     public async Task<Subscriber> CreateSubscriberRequestAsync(SubscriberRequestDto dto)
@@ -97,14 +100,31 @@ public class SubscriberService : ISubscriberService
         var subscriber = await _subscriberRepository.GetByIdAsync(id)
                          ?? throw new NotFoundException("Subscriber not found");
 
-        var counter = await _counterService.CreateCountersAsync(dto);
-        
-        subscriber.CounterId = counter.Id;
+        var counter = await _counterService.CreateCountersAsync(dto, id);
         
         subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CodeGenerated);
         
         await _subscriberRepository.UpdateAsync(subscriber); 
         await _loggingService.LogActionAsync("Create Counter and Connect", nameof(Subscriber), subscriber.Id);
+        return subscriber;
+    }
+    public async Task<Subscriber> UpdateCounterForSubscriberAsync(int id, CounterDto dto)
+    {
+        var subscriber = await _subscriberRepository.GetByIdAsync(id)
+                         ?? throw new NotFoundException("Subscriber not found");
+
+        var oldCounter = _counterRepository.GetBySubscriberIdAsync(subscriber.Id).Result
+                         ?? throw new NotFoundException("This subscriber have not counter");
+
+        oldCounter.Status = 2;
+
+        var counter = await _counterService.CreateCountersAsync(dto, subscriber.Id);
+        
+        // subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CodeGenerated);
+        
+        // await _subscriberRepository.UpdateAsync(subscriber); 
+        await _loggingService.LogActionAsync("Update Counter", nameof(Counter), counter.Id);
+        await _loggingService.LogActionAsync("Connected Counter to Subscriber", nameof(Subscriber), subscriber.Id);
         return subscriber;
     }
     public async Task<Subscriber> ConnectTmToSubscriberAsync(int id, int tmId)
@@ -177,5 +197,21 @@ public class SubscriberService : ISubscriberService
         }
 
         return _mapper.Map<List<SubscriberProfileDto>>(subscribers);
+    }
+    public async Task<SubscriberDebtDto> GetDebtBySubscriberCodeAsync(string subscriberCode)
+    {
+        var subscriber = await _subscriberRepository.GetWithCountersByCodeAsync(subscriberCode)
+                     ?? throw new NotFoundException("Subscriber not found");
+
+        var counter = subscriber.Counters.FirstOrDefault(c => c.SubscriberId == subscriber.Id);
+
+        return new SubscriberDebtDto
+        {
+            SubscriberCode = subscriber.SubscriberCode!,
+            Name = subscriber.Name,
+            Surname = subscriber.Surname,
+            Debt = subscriber.Debt,
+            TotalCurrentValue = counter?.CurrentValue ?? 0
+        };
     }
 }

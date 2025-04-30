@@ -12,4 +12,5 @@ public interface ISubscriberRepository : IGenericRepository<Subscriber>
     Task<List<Subscriber>> GetByUserIdAsync(int userId);
     Task<List<Subscriber>> GetRequestsByFinAsync(string finCode);
     Task<List<Subscriber>> GetUserRequestsInLastMonthAsync(int userId);
+    Task<Subscriber?> GetWithCountersByCodeAsync(string subscriberCode);
 }

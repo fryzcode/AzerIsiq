@@ -16,11 +16,13 @@ public class SubscriberController : ControllerBase
 {
     private readonly ISubscriberService _subscriberService;
     private readonly IValidator<SubscriberRequestDto> _sbDtoValidator;
+    private readonly IValidator<CounterDto> _counterDtoValidator;
     
-    public SubscriberController(ISubscriberService subscriberService,IValidator<SubscriberRequestDto> sbDtoValidator)
+    public SubscriberController(ISubscriberService subscriberService,IValidator<SubscriberRequestDto> sbDtoValidator, IValidator<CounterDto> counterDtoValidator)
     {
         _subscriberService = subscriberService;
         _sbDtoValidator = sbDtoValidator;
+        _counterDtoValidator = counterDtoValidator;
     }
 
     [HttpPost]
@@ -52,10 +54,19 @@ public class SubscriberController : ControllerBase
     
     [HttpPost("sb-counter")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateSbCounter ([FromQuery] int id, CounterDto dto)
+    public async Task<IActionResult> CreateSbCounter([FromQuery] int id, [FromBody] CounterDto dto)
     {
+        await _counterDtoValidator.ValidateAndThrowAsync(dto);
         await _subscriberService.CreateCounterForSubscriberAsync(id, dto);
-    
+        return Ok(new { Message = "Success" });
+    }
+
+    [HttpPost("counter-update")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateSbCounter([FromQuery] int id, [FromBody] CounterDto dto)
+    {
+        await _counterDtoValidator.ValidateAndThrowAsync(dto);
+        await _subscriberService.UpdateCounterForSubscriberAsync(id, dto);
         return Ok(new { Message = "Success" });
     }
     
@@ -98,5 +109,12 @@ public class SubscriberController : ControllerBase
 
         var profiles = await _subscriberService.GetProfilesAsync(userId);
         return Ok(profiles); 
+    }
+
+    [HttpGet("debt")]
+    public async Task<IActionResult> GetDebtBySubscriberCode([FromQuery] string subscriberCode)
+    {
+        var userDebt = await _subscriberService.GetDebtBySubscriberCodeAsync(subscriberCode);
+        return Ok(userDebt);
     }
 }

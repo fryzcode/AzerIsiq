@@ -134,10 +134,10 @@ namespace AzerIsiq.Data
                 .HasForeignKey(s => s.StreetId)
                 .OnDelete(DeleteBehavior.NoAction);
             
-            modelBuilder.Entity<Subscriber>()
-                .HasOne(s => s.Counter)
-                .WithMany()
-                .HasForeignKey(s => s.CounterId)
+            modelBuilder.Entity<Counter>()
+                .HasOne(c => c.Subscriber)
+                .WithMany(s => s.Counters)
+                .HasForeignKey(c => c.SubscriberId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Subscriber>()
@@ -162,6 +162,10 @@ namespace AzerIsiq.Data
                 .HasOne(s => s.User)
                 .WithMany(u => u.Subscribers)
                 .HasForeignKey(s => s.UserId);
+            
+            modelBuilder.Entity<Subscriber>()
+                .Property(s => s.Debt)
+                .HasPrecision(18, 2);
         }
     }
 }

@@ -23,12 +23,12 @@ public class Subscriber
     public string Apartment { get; set; } = null!;
     public string? Ats { get; set; }
     public string? SubscriberCode { get; set; }
-    public int? CounterId { get; set; }
-    public Counter? Counter { get; set; }
+    public ICollection<Counter> Counters { get; set; } = new List<Counter>();
     public int? TmId { get; set; }
     public Tm? Tm { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int Status { get; set; } = 1;
     public int? UserId { get; set; }
     public User User { get; set; } = null!;
+    public decimal Debt { get; set; }
 }

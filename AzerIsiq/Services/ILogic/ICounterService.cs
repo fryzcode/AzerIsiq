@@ -5,5 +5,5 @@ namespace AzerIsiq.Services.ILogic;
 
 public interface ICounterService
 {
-    Task<Counter> CreateCountersAsync(CounterDto dto);
+    Task<Counter> CreateCountersAsync(CounterDto dto, int subscriberId);
 }

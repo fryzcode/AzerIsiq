@@ -8,4 +8,12 @@ public class Counter
     public int Coefficient { get; set; }
     public string Volt { get; set; } = null!;
     public string Type { get; set; } = null!;
+    public int Phase { get; set; }
+    public int CurrentValue { get; set; }
+    public int Status { get; set; } = 1;
+    // public int SubscriberId { get; set; }
+    // public Subscriber Subscriber { get; set; } = null!;
+    public int? SubscriberId { get; set; }
+    public Subscriber? Subscriber { get; set; }
+
 }

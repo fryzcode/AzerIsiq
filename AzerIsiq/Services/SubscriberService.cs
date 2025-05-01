@@ -113,16 +113,19 @@ public class SubscriberService : ISubscriberService
         var subscriber = await _subscriberRepository.GetByIdAsync(id)
                          ?? throw new NotFoundException("Subscriber not found");
 
-        var oldCounter = _counterRepository.GetBySubscriberIdAsync(subscriber.Id).Result
-                         ?? throw new NotFoundException("This subscriber have not counter");
+        var oldCounters = await _counterRepository.GetBySubscriberIdAsync(subscriber.Id);
 
-        oldCounter.Status = 2;
+        if (oldCounters == null || !oldCounters.Any())
+            throw new NotFoundException("This subscriber does not have any counters");
 
+        foreach (var oldCounter in oldCounters)
+        {
+            oldCounter.Status = 2;
+            await _counterRepository.UpdateAsync(oldCounter);
+        }
+        
         var counter = await _counterService.CreateCountersAsync(dto, subscriber.Id);
         
-        // subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CodeGenerated);
-        
-        // await _subscriberRepository.UpdateAsync(subscriber); 
         await _loggingService.LogActionAsync("Update Counter", nameof(Counter), counter.Id);
         await _loggingService.LogActionAsync("Connected Counter to Subscriber", nameof(Subscriber), subscriber.Id);
         return subscriber;
@@ -201,17 +204,8 @@ public class SubscriberService : ISubscriberService
     public async Task<SubscriberDebtDto> GetDebtBySubscriberCodeAsync(string subscriberCode)
     {
         var subscriber = await _subscriberRepository.GetWithCountersByCodeAsync(subscriberCode)
-                     ?? throw new NotFoundException("Subscriber not found");
+                         ?? throw new NotFoundException("Subscriber not found");
 
-        var counter = subscriber.Counters.FirstOrDefault(c => c.SubscriberId == subscriber.Id);
-
-        return new SubscriberDebtDto
-        {
-            SubscriberCode = subscriber.SubscriberCode!,
-            Name = subscriber.Name,
-            Surname = subscriber.Surname,
-            Debt = subscriber.Debt,
-            TotalCurrentValue = counter?.CurrentValue ?? 0
-        };
+        return _mapper.Map<SubscriberDebtDto>(subscriber);
     }
 }

@@ -12,14 +12,8 @@ public class CounterRepository: GenericRepository<Counter>, ICounterRepository
     {
         _context = context;
     }
-    
-    public async Task<Counter?> GetBySubscriberIdAsync(int subscriberId)
-    {
-        return await _context.Counters
-            .FirstOrDefaultAsync(c => c.SubscriberId == subscriberId);
-    }
 
-    public async Task<List<Counter>> GetAllBySubscriberIdAsync(int subscriberId)
+    public async Task<List<Counter>> GetBySubscriberIdAsync(int subscriberId)
     {
         return await _context.Counters
             .Where(c => c.SubscriberId == subscriberId)

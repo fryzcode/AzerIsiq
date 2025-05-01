@@ -16,7 +16,7 @@ public class CounterService : ICounterService
 
     public async Task<Counter> CreateCountersAsync(CounterDto dto, int subscriberId)
     {
-        var counters = await _counterRepository.GetAllBySubscriberIdAsync(subscriberId);
+        var counters = await _counterRepository.GetBySubscriberIdAsync(subscriberId);
         if (counters.Count >= 3)
         {
             throw new InvalidOperationException("This subscriber already has 3 counters.");

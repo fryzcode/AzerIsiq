@@ -33,5 +33,13 @@ public class SubscriberProfile : Profile
                 opt => opt.MapFrom(src => $"{src.Region!.Name}, {src.District!.Name}, {src.Street.Name ?? ""}, {src.Building}, {src.Apartment}"))
             .ForMember(dest => dest.RequestStatus,
                 opt => opt.MapFrom(src => src.Status));
+ 
+        CreateMap<Subscriber, SubscriberDebtDto>()
+            .ForMember(dest => dest.DistrictName, opt => opt.MapFrom(src => src.District != null ? src.District.Name : "Unknown"))
+            .ForMember(dest => dest.TotalCurrentValue, opt => opt.MapFrom(src => 
+                src.Counters.FirstOrDefault(c => c.SubscriberId == src.Id) != null 
+                    ? src.Counters.First(c => c.SubscriberId == src.Id).CurrentValue 
+                    : 0));
+
     }
 }

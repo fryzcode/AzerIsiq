@@ -176,9 +176,7 @@ public class SubscriberRepository : GenericRepository<Subscriber>, ISubscriberRe
     {
         return await _context.Subscribers
             .Include(x => x.Counters)
+            .Include(x => x.District)
             .FirstOrDefaultAsync(x => x.SubscriberCode == subscriberCode);
     }
-    
-
-
 }

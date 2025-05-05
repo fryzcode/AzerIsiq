@@ -1,4 +1,5 @@
 using AzerIsiq.Extensions;
+using AzerIsiq.Extensions.DbInit;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Extensions.Middlewares;
 
@@ -32,6 +33,12 @@ Console.WriteLine($"Kestrel Port: {kestrelPort}");
 
 var app = builder.Build();
 
+// using (var scope = app.Services.CreateScope())
+// {
+//     var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+//     dbInitializer.Initialize();
+// }
+
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseMiddleware<ValidationExceptionMiddleware>();
 
@@ -48,6 +55,8 @@ app.UseAuthentication();
 app.UseMiddleware<BlockedUserMiddleware>();
 app.UseAuthorization();
 
+// app.UseHttpMetrics(); Prometheus
 app.MapControllers();
+// app.MapMetrics();     Prometheus
 
 app.Run();

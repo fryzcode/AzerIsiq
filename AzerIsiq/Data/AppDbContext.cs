@@ -24,6 +24,7 @@ namespace AzerIsiq.Data
         public DbSet<Subscriber> Subscribers { get; set; }
         public DbSet<Territory> Territories { get; set; }
         public DbSet<Street> Streets { get; set; }
+        public DbSet<ElectronicAppeal> ElectronicAppeals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.BackgroundTasks;
+using AzerIsiq.Extensions.DbInit;
 using AzerIsiq.Extensions.Mapping;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
@@ -26,6 +27,8 @@ namespace AzerIsiq.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            // Db init
+            services.AddScoped<IDbInitializer, DbInitializer>();
             // Repository
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
@@ -72,6 +75,10 @@ namespace AzerIsiq.Extensions
             
             services.AddHostedService<FailedAttemptsResetTask>();
             services.AddHostedService<SubscriberDebtService>();
+            
+            services.AddScoped<IElectronicAppealRepository, ElectronicAppealRepository>();
+            services.AddScoped<IElectronicAppealService, ElectronicAppealService>();
+
             
             services.AddAutoMapper(typeof(Program));
 

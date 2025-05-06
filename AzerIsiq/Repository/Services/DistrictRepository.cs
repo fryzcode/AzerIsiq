@@ -14,12 +14,12 @@ public class DistrictRepository : ReadOnlyRepository<District>, IDistrictReposit
         _context = context;
     }
 
-    public async Task<IEnumerable<Substation>> GetSubstationsByDistrictAsync(int districtId)
+    public async Task<IReadOnlyList<Substation>> GetSubstationsByDistrictAsync(int districtId)
     {
         return await _context.Substations.Where(s => s.DistrictId == districtId).ToListAsync();
     }
     
-    public async Task<IEnumerable<Tm>> GetTmsByDistrictAsync(int districtId)
+    public async Task<IReadOnlyList<Tm>> GetTmsByDistrictAsync(int districtId)
     {
         return await _context.Tms
             .Include(tm => tm.Substation)
@@ -27,12 +27,12 @@ public class DistrictRepository : ReadOnlyRepository<District>, IDistrictReposit
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Territory>> GetTerritoryByDistrictAsync(int districtId)
+    public async Task<IReadOnlyList<Territory>> GetTerritoryByDistrictAsync(int districtId)
     {
         return await _context.Territories.Where(t => t.DistrictId == districtId).ToListAsync();
     }
     
-    public async Task<IEnumerable<Street>> GetStreetByTerritoryAsync(int territoryId)
+    public async Task<IReadOnlyList<Street>> GetStreetByTerritoryAsync(int territoryId)
     {
         return await _context.Streets.Where(s => s.TerritoryId == territoryId).ToListAsync();
     }

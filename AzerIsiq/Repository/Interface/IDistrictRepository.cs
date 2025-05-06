@@ -4,8 +4,8 @@ namespace AzerIsiq.Repository.Interface;
 
 public interface IDistrictRepository : IReadOnlyRepository<District>
 {
-    Task<IEnumerable<Substation>> GetSubstationsByDistrictAsync(int districtId);
-    Task<IEnumerable<Tm>> GetTmsByDistrictAsync(int districtId);
-    Task<IEnumerable<Territory>> GetTerritoryByDistrictAsync(int districtId);
-    Task<IEnumerable<Street>> GetStreetByTerritoryAsync(int territoryId);
+    Task<IReadOnlyList<Substation>> GetSubstationsByDistrictAsync(int districtId);
+    Task<IReadOnlyList<Tm>> GetTmsByDistrictAsync(int districtId);
+    Task<IReadOnlyList<Territory>> GetTerritoryByDistrictAsync(int districtId);
+    Task<IReadOnlyList<Street>> GetStreetByTerritoryAsync(int territoryId);
 }

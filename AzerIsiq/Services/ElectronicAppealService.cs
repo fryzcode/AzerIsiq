@@ -1,4 +1,5 @@
 using AutoMapper;
+using AzerIsiq.Dtos;
 using AzerIsiq.Dtos.ElectronicAppealDto;
 using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
@@ -17,10 +18,17 @@ public class ElectronicAppealService : IElectronicAppealService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ElectronicAppealDto>> GetAllAsync()
+    public async Task<PagedResultDto<ElectronicAppealDto>> GetAllAsync(PagedRequestDto requestDto, ElectronicAppealFilterDto? filter)
     {
-        var appeals = await _repository.GetAllAsync();
-        return _mapper.Map<IEnumerable<ElectronicAppealDto>>(appeals);
+        var (items, totalCount) = await _repository.GetPagedAsync(requestDto, filter);
+
+        return new PagedResultDto<ElectronicAppealDto>
+        {
+            Items = _mapper.Map<IEnumerable<ElectronicAppealDto>>(items),
+            TotalCount = totalCount,
+            Page = requestDto.Page,
+            PageSize = requestDto.PageSize
+        };
     }
 
     public async Task<ElectronicAppealDto> GetByIdAsync(int id)

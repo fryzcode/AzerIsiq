@@ -14,22 +14,22 @@ public class RegionRepository : ReadOnlyRepository<Region>, IRegionRepository
         _context = context;
     }
     
-    public async Task<IEnumerable<District>> GetDistrictsByRegionAsync(int regionId)
+    public async Task<IReadOnlyList<District>> GetDistrictsByRegionAsync(int regionId)
     {
         return await _context.Districts.Where(d => d.RegionId == regionId).ToListAsync();
     }
     
-    public async Task<IEnumerable<Substation>> GetSubstationsByDistrictAsync(int districtId)
+    public async Task<IReadOnlyList<Substation>> GetSubstationsByDistrictAsync(int districtId)
     {
         return await _context.Substations.Where(s => s.DistrictId == districtId).ToListAsync();
     }
 
-    public async Task<IEnumerable<Tm>> GetTmsBySubstationAsync(int substationId)
+    public async Task<IReadOnlyList<Tm>> GetTmsBySubstationAsync(int substationId)
     {
         return await _context.Tms.Where(t => t.SubstationId == substationId).ToListAsync();
     }
 
-    public async Task<IEnumerable<Substation>> GetSubstationsByRegionAsync(int regionId)
+    public async Task<IReadOnlyList<Substation>> GetSubstationsByRegionAsync(int regionId)
     {
         var districts = await _context.Districts
             .Where(d => d.RegionId == regionId)
@@ -43,7 +43,7 @@ public class RegionRepository : ReadOnlyRepository<Region>, IRegionRepository
         return substations;
     }
 
-    public async Task<IEnumerable<Tm>> GetTmsByRegionAsync(int regionId)
+    public async Task<IReadOnlyList<Tm>> GetTmsByRegionAsync(int regionId)
     {
         return await _context.Tms
             .Include(tm => tm.Substation)

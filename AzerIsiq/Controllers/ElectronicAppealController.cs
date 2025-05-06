@@ -1,5 +1,7 @@
+using AzerIsiq.Dtos;
 using AzerIsiq.Dtos.ElectronicAppealDto;
 using AzerIsiq.Services.ILogic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AzerIsiq.Controllers;
@@ -16,13 +18,17 @@ public class ElectronicAppealController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    // [Authorize(Roles = "Admin,Operator")]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] PagedRequestDto requestDto,
+        [FromQuery] ElectronicAppealFilterDto? filter)
     {
-        var result = await _electronicAppealService.GetAllAsync();
+        var result = await _electronicAppealService.GetAllAsync(requestDto, filter);
         return Ok(result);
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _electronicAppealService.GetByIdAsync(id);
@@ -37,6 +43,7 @@ public class ElectronicAppealController : ControllerBase
     }
 
     [HttpPatch("{id}/mark-as-read")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> MarkAsRead(int id)
     {
         var result = await _electronicAppealService.MarkAsReadAsync(id);
@@ -44,6 +51,7 @@ public class ElectronicAppealController : ControllerBase
     }
 
     [HttpPatch("{id}/mark-as-replied")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> MarkAsReplied(int id)
     {
         var result = await _electronicAppealService.MarkAsRepliedAsync(id);

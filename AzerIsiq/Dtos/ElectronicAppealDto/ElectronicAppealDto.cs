@@ -15,4 +15,5 @@ public class ElectronicAppealDto
     public bool IsReplied { get; set; }
     public DateTime ReadAt { get; set; }
     public DateTime RepliedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

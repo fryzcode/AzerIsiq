@@ -18,7 +18,7 @@ public class ElectronicAppealController : ControllerBase
     }
 
     [HttpGet]
-    // [Authorize(Roles = "Admin,Operator")]
+    [Authorize(Roles = "Admin,Operator")]
     public async Task<IActionResult> GetAll(
         [FromQuery] PagedRequestDto requestDto,
         [FromQuery] ElectronicAppealFilterDto? filter)
@@ -57,4 +57,13 @@ public class ElectronicAppealController : ControllerBase
         var result = await _electronicAppealService.MarkAsRepliedAsync(id);
         return Ok(result);
     }
+    
+    [HttpGet("statistics")]
+    [Authorize(Roles = "Admin,Operator")]
+    public async Task<IActionResult> GetStatistics()
+    {
+        var stats = await _electronicAppealService.GetStatisticsAsync();
+        return Ok(stats);
+    }
+
 }

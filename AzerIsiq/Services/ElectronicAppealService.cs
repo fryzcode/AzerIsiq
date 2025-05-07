@@ -73,4 +73,27 @@ public class ElectronicAppealService : IElectronicAppealService
 
         return _mapper.Map<ElectronicAppealDto>(appeal);
     }
+    
+    public async Task<ElectronicAppealStatisticsDto> GetStatisticsAsync()
+    {
+        var appeals = await _repository.GetAllAsync();
+
+        var dto = new ElectronicAppealStatisticsDto
+        {
+            TotalAppeals = appeals.Count(),
+            ReadAppeals = appeals.Count(x => x.IsRead),
+            UnreadAppeals = appeals.Count(x => !x.IsRead),
+            RepliedAppeals = appeals.Count(x => x.IsReplied),
+            NotRepliedAppeals = appeals.Count(x => !x.IsReplied),
+            ByTopic = appeals
+                .GroupBy(x => x.Topic.ToString())
+                .ToDictionary(g => g.Key, g => g.Count()),
+            MonthlyAppeals = appeals
+                .GroupBy(x => x.CreatedAt.ToString("yyyy-MM"))
+                .ToDictionary(g => g.Key, g => g.Count())
+        };
+
+        return dto;
+    }
+
 }

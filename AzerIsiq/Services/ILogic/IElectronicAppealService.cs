@@ -12,4 +12,5 @@ public interface IElectronicAppealService
     Task<ElectronicAppealDto> CreateAsync(ElectronicAppealCreateDto dto);
     Task<ElectronicAppealDto> MarkAsReadAsync(int id);
     Task<ElectronicAppealDto> MarkAsRepliedAsync(int id);
+    Task<ElectronicAppealStatisticsDto> GetStatisticsAsync();
 }

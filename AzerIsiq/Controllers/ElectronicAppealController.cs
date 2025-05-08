@@ -1,6 +1,7 @@
 using AzerIsiq.Dtos;
 using AzerIsiq.Dtos.ElectronicAppealDto;
 using AzerIsiq.Services.ILogic;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,16 @@ namespace AzerIsiq.Controllers;
 public class ElectronicAppealController : ControllerBase
 {
     private readonly IElectronicAppealService _electronicAppealService;
+    private readonly IValidator<ElectronicAppealCreateDto> _electronicAppealDtoValidator;
+
     
-    public ElectronicAppealController(IElectronicAppealService electronicAppealService)
+    public ElectronicAppealController(
+        IElectronicAppealService electronicAppealService,
+        IValidator<ElectronicAppealCreateDto> electronicAppealDtoValidator
+        )
     {
         _electronicAppealService = electronicAppealService;
+        _electronicAppealDtoValidator = electronicAppealDtoValidator;
     }
 
     [HttpGet]
@@ -38,6 +45,7 @@ public class ElectronicAppealController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ElectronicAppealCreateDto dto)
     {
+        await _electronicAppealDtoValidator.ValidateAndThrowAsync(dto);
         var result = await _electronicAppealService.CreateAsync(dto);
         return Ok(result);
     }
@@ -65,5 +73,4 @@ public class ElectronicAppealController : ControllerBase
         var stats = await _electronicAppealService.GetStatisticsAsync();
         return Ok(stats);
     }
-
 }

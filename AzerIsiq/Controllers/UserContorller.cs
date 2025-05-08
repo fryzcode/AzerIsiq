@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AzerIsiq.Dtos;
 using AzerIsiq.Dtos.LogEntryDto;
 using AzerIsiq.Repository.Interface;
@@ -27,11 +28,26 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(int id)
     {
         var user = await _userService.GetUserByIdAsync(id);
         return Ok(user);
     }
+    
+    // [Authorize]
+    // [HttpGet("me")]
+    // public async Task<IActionResult> GetMyProfile()
+    // {
+    //     var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+    //
+    //     var user = await _userService.GetUserByIdAsync(currentUserId);
+    //     if (user == null)
+    //         return NotFound();
+    //
+    //     return Ok(user);
+    // }
+    
     [Authorize(Roles = "Admin")]
     [HttpPost("block")]
     public async Task<IActionResult> BlockUser([FromBody] BlockUserDto dto)

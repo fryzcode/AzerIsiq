@@ -47,7 +47,6 @@ public class SubstationController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var sb = await _substationService.GetSubstationByIdAsync(id);
-        
         return Ok(sb);
     }
     
@@ -55,9 +54,6 @@ public class SubstationController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id, [FromForm] SubstationDto dto)
     {
-        if (dto == null)
-            return BadRequest("Invalid substation data");
-
         var updatedSubstation = await _substationService.EditSubstationAsync(id, dto);
         return Ok(new { Message = "Success", Id = updatedSubstation.Id, Name = updatedSubstation.Name, DistrictId = updatedSubstation.DistrictId });
     }

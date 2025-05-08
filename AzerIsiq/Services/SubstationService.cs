@@ -82,7 +82,7 @@ public class SubstationService : ISubstationService
             await _imageService.UpdateSubOrTmImageAsync(image);
         }
 
-        await _loggingService.LogActionAsync("Create", nameof(Substation), createdSubstation.Id);
+        await _loggingService.LogActionAsync("Create", nameof(Substation), createdSubstation.Id, substation.Name);
         return createdSubstation;
     }
     public async Task<Substation> EditSubstationAsync(int id, SubstationDto dto)
@@ -110,7 +110,7 @@ public class SubstationService : ISubstationService
             await UpdateSubstationImageAsync(substation.Id, dto.Image);
         }
 
-        await _loggingService.LogActionAsync("Edit", nameof(Substation), id);
+        await _loggingService.LogActionAsync("Edit", nameof(Substation), substation.Id, substation.Name);
 
         return substation;
     }
@@ -134,7 +134,7 @@ public class SubstationService : ISubstationService
         
         await _substationRepository.DeleteAsync(substation.Id);
         
-        await _loggingService.LogActionAsync("Delete", nameof(Substation), id);
+        await _loggingService.LogActionAsync("Delete", nameof(Substation),  substation.Id, substation.Name);
         return true;
     }
     public async Task ValidateRegionAndDistrictAsync(SubstationDto dto)

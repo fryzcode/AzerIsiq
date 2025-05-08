@@ -6,7 +6,7 @@ public interface ILoggingService
 {
     Task<IEnumerable<LogEntryDto>> GetLogsAsync(LogEntryFilterDto filter);
     Task<int> CountLogsAsync(LogEntryFilterDto filter);
-    Task LogActionAsync(string action, string entityName, int entityId);
+    Task LogActionAsync(string action, string entityType, int entityId, string entityName);
     Task<IEnumerable<string>> GetAllEntityNamesAsync();
     Task<IEnumerable<LogEntryDto>> GetLogsBySubscriberCodeAsync(string subscriberCode);
 

@@ -10,11 +10,16 @@ namespace AzerIsiq.Services;
 public class ElectronicAppealService : IElectronicAppealService
 {
     private readonly IElectronicAppealRepository _repository;
+    private readonly ILoggingService _loggingService;
     private readonly IMapper _mapper;
     
-    public ElectronicAppealService(IElectronicAppealRepository repository, IMapper mapper)
+    public ElectronicAppealService(
+        IElectronicAppealRepository repository, 
+        IMapper mapper, 
+        ILoggingService loggingService)
     {
         _repository = repository;
+        _loggingService = loggingService;
         _mapper = mapper;
     }
 
@@ -56,6 +61,7 @@ public class ElectronicAppealService : IElectronicAppealService
             appeal.ReadAt = DateTime.UtcNow;
             await _repository.UpdateAsync(appeal);
         }
+        await _loggingService.LogActionAsync("Read Electronic Appeal", nameof(ElectronicAppeal), appeal.Id, appeal.Email);
         return _mapper.Map<ElectronicAppealDto>(appeal);
     }
 
@@ -70,7 +76,7 @@ public class ElectronicAppealService : IElectronicAppealService
             appeal.RepliedAt = DateTime.UtcNow;
             await _repository.UpdateAsync(appeal);
         }
-
+        await _loggingService.LogActionAsync("Replied Electronic Appeal", nameof(ElectronicAppeal), appeal.Id, appeal.Email);
         return _mapper.Map<ElectronicAppealDto>(appeal);
     }
     

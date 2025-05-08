@@ -92,7 +92,7 @@ public class SubscriberService : ISubscriberService
         subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.Initial);
 
         await _subscriberRepository.UpdateAsync(subscriber);
-        await _loggingService.LogActionAsync("Create Subscriber Code", nameof(Subscriber), subscriber.Id);
+        await _loggingService.LogActionAsync("Create Subscriber Code", nameof(Subscriber), subscriber.Id, subscriber.Name);
         return subscriber;
     }
     public async Task<Subscriber> CreateCounterForSubscriberAsync(int id, CounterDto dto)
@@ -105,7 +105,7 @@ public class SubscriberService : ISubscriberService
         subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CodeGenerated);
         
         await _subscriberRepository.UpdateAsync(subscriber); 
-        await _loggingService.LogActionAsync("Create Counter and Connect", nameof(Subscriber), subscriber.Id);
+        await _loggingService.LogActionAsync("Create Counter and Connect", nameof(Subscriber), subscriber.Id, subscriber.Name);
         return subscriber;
     }
     public async Task<Subscriber> UpdateCounterForSubscriberAsync(int id, CounterDto dto)
@@ -126,8 +126,8 @@ public class SubscriberService : ISubscriberService
         
         var counter = await _counterService.CreateCountersAsync(dto, subscriber.Id);
         
-        await _loggingService.LogActionAsync("Update Counter", nameof(Counter), counter.Id);
-        await _loggingService.LogActionAsync("Connected Counter to Subscriber", nameof(Subscriber), subscriber.Id);
+        await _loggingService.LogActionAsync("Update Counter", nameof(Counter), counter.Id, counter.Number);
+        await _loggingService.LogActionAsync("Connected Counter to Subscriber", nameof(Subscriber), subscriber.Id, subscriber.Name);
         return subscriber;
     }
     public async Task<Subscriber> ConnectTmToSubscriberAsync(int id, int tmId)
@@ -142,7 +142,7 @@ public class SubscriberService : ISubscriberService
         subscriber.Status = SubscriberStatusHelper.AdvanceStatus(subscriber.Status, SubscriberStatus.CounterConnected);
         
         await _subscriberRepository.UpdateAsync(subscriber);
-        await _loggingService.LogActionAsync("Connect Transformator", nameof(Subscriber), subscriber.Id);
+        await _loggingService.LogActionAsync("Connect Transformator", nameof(Subscriber), subscriber.Id, subscriber.Name);
         return subscriber;
     }
     public async Task<(bool IsConfirmed, Subscriber Subscriber)> ApplySubscriberContractAsync(int id)
@@ -161,7 +161,7 @@ public class SubscriberService : ISubscriberService
             await _subscriberRepository.UpdateAsync(subscriber);
         }
         
-        await _loggingService.LogActionAsync("Apply Contract", nameof(Subscriber), subscriber.Id);
+        await _loggingService.LogActionAsync("Apply Contract", nameof(Subscriber), subscriber.Id, subscriber.Name);
         return (false, subscriber);
     }
     public async Task<PagedResultDto<SubscriberDto>> GetSubscribersFilteredAsync(PagedRequestDto request, SubscriberFilterDto dtoFilter)

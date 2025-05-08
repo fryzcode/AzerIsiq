@@ -3,6 +3,7 @@ using AzerIsiq.Models;
 using AzerIsiq.Repository.Interface;
 using AzerIsiq.Services;
 using AzerIsiq.Services.ILogic;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace AzerIsiq.Extensions.Repository;
 
@@ -27,12 +28,13 @@ public class LoggingService:ILoggingService
         return await _loggerRepository.CountFilteredAsync(filter);
     }
     
-    public async Task LogActionAsync(string action, string entityName, int entityId)
+    public async Task LogActionAsync(string action, string entityType, int entityId, string entityName)
     {
         var logEntry = new LogEntry
         {
             Action = action,
             EntityId = entityId,
+            EntityType = entityType,
             EntityName = entityName,
             UserId = _authService.GetCurrentUserId(),
             Timestamp = DateTime.UtcNow

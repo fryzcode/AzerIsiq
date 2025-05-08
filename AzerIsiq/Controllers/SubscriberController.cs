@@ -18,7 +18,7 @@ public class SubscriberController : ControllerBase
     private readonly IValidator<SubscriberRequestDto> _sbDtoValidator;
     private readonly IValidator<CounterDto> _counterDtoValidator;
     
-    public SubscriberController(ISubscriberService subscriberService,IValidator<SubscriberRequestDto> sbDtoValidator, IValidator<CounterDto> counterDtoValidator)
+    public SubscriberController(ISubscriberService subscriberService, IValidator<SubscriberRequestDto> sbDtoValidator, IValidator<CounterDto> counterDtoValidator)
     {
         _subscriberService = subscriberService;
         _sbDtoValidator = sbDtoValidator;

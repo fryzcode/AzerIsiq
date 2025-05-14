@@ -13,6 +13,7 @@ using System.Text;
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.BackgroundTasks;
 using AzerIsiq.Extensions.DbInit;
+using AzerIsiq.Extensions.Hubs.CustomProvider;
 using AzerIsiq.Extensions.Mapping;
 using AzerIsiq.Extensions.Repository;
 using AzerIsiq.Models;
@@ -20,6 +21,7 @@ using AzerIsiq.Services.Helpers;
 using AzerIsiq.Services.ILogic;
 using AzerIsiq.Validators;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace AzerIsiq.Extensions
 {
@@ -50,7 +52,9 @@ namespace AzerIsiq.Extensions
             services.AddScoped<ICounterRepository, CounterRepository>();
             services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
             services.AddScoped<ILoggerRepository, LoggerRepository>();
-
+            services.AddScoped<IChatRepository, ChatRepository>();
+            
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             
             // Services
             services.AddScoped(typeof(IReadOnlyService<>), typeof(ReadOnlyService<>));
@@ -79,7 +83,8 @@ namespace AzerIsiq.Extensions
             services.AddScoped<IElectronicAppealRepository, ElectronicAppealRepository>();
             services.AddScoped<IElectronicAppealService, ElectronicAppealService>();
 
-            
+            services.AddScoped<IChatService, ChatService>();
+
             services.AddAutoMapper(typeof(Program));
 
             services.AddHttpContextAccessor();
@@ -87,21 +92,119 @@ namespace AzerIsiq.Extensions
 
             return services;
         }
-
+        
         public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy("OpenPolicy", policy =>
                 {
                     policy.AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader();
                 });
+
+                options.AddPolicy("SignalRPolicy", policy =>
+                {
+                    policy.WithOrigins(
+                            "http://127.0.0.1:5500",
+                            "http://localhost:3000",
+                            "http://127.0.0.1:3000",
+                            // "http://localhost:5500",
+                            "http://192.168.137.19:3000",
+                            "https://192.168.137.19:3000"
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
             });
 
             return services;
         }
+
+
+        // public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
+        // {
+        //     services.AddCors(options =>
+        //     {
+        //         options.AddPolicy("OpenPolicy", policy =>
+        //         {
+        //             policy.AllowAnyOrigin()
+        //                 .AllowAnyMethod()
+        //                 .AllowAnyHeader();
+        //             
+        //         });
+        //
+        //         options.AddPolicy("SignalRPolicy", policy =>
+        //         {
+        //             policy.WithOrigins(
+        //                     "http://127.0.0.1:5500",
+        //                     "http://127.0.0.1:3000",
+        //                     "http://192.168.137.19:3000",
+        //                     "https://192.168.137.19:3000",
+        //                     "http://192.168.137.19:3000/chat"
+        //                 )
+        //                 .AllowAnyMethod()
+        //                 .AllowAnyHeader()
+        //                 .AllowCredentials();
+        //         });
+        //     });
+        //
+        //     return services;
+        // }
+
+        // public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
+        // {
+        //
+        //     // services.AddCors(options =>
+        //     // {
+        //     //     options.AddPolicy("AllowAll", policy =>
+        //     //     {
+        //     //         policy.AllowAnyOrigin()
+        //     //             .AllowAnyMethod()
+        //     //             .AllowAnyHeader();
+        //     //     });
+        //     // });
+        //     
+        //     // services.AddCors(options =>
+        //     // {
+        //     //     options.AddPolicy("AllowAll", policy =>
+        //     //     {
+        //     //         policy.WithOrigins(
+        //     //                 "http://127.0.0.1:5500",
+        //     //                 "http://192.168.137.19:3000"
+        //     //             )
+        //     //             .AllowAnyMethod()
+        //     //             .AllowAnyHeader()
+        //     //             .AllowCredentials();
+        //     //     });
+        //     // });
+        //     //
+        //     // services.AddCors(options =>
+        //     // {
+        //     //     options.AddPolicy("AllowAll", policy =>
+        //     //     {
+        //     //         policy.WithOrigins("http://127.0.0.1:5500")
+        //     //             .AllowAnyMethod()
+        //     //             .AllowAnyHeader()
+        //     //             .AllowCredentials();
+        //     //     });
+        //     // });
+        //     //
+        //     // services.AddCors(options =>
+        //     // {
+        //     //     options.AddPolicy("AllowAll", policy =>
+        //     //     {
+        //     //         policy.WithOrigins("http://192.168.137.19:3000")
+        //     //             .AllowAnyMethod()
+        //     //             .AllowAnyHeader()
+        //     //             .AllowCredentials();
+        //     //     });
+        //     // });
+        //
+        //     return services;
+        // }
 
         public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
@@ -134,6 +237,23 @@ namespace AzerIsiq.Extensions
                         ValidIssuer = jwtSettings["Issuer"],
                         ValidAudience = jwtSettings["Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(key)
+                    };
+                    
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                path.StartsWithSegments("/chathub"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 

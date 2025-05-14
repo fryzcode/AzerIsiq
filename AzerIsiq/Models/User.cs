@@ -26,6 +26,8 @@ namespace AzerIsiq.Models
         public List<OtpCode> OtpCodes { get; set; } = new();
         public bool IsBlocked { get; set; } = false;
         public List<Subscriber> Subscribers { get; set; } = new();
+        public ICollection<Message> SentMessages { get; set; }
+        public ICollection<Message> ReceivedMessages { get; set; }
     }
 
 }

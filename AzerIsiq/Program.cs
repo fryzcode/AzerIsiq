@@ -11,6 +11,7 @@ builder.Services
     .AddJwtAuthentication(builder.Configuration)
     .AddApplicationServices();
 
+builder.Services.AddSignalR();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
@@ -38,7 +39,6 @@ var app = builder.Build();
 //     var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
 //     dbInitializer.Initialize();
 // }
-
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseMiddleware<ValidationExceptionMiddleware>();
 
@@ -48,12 +48,27 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseRouting();
+app.UseCors("OpenPolicy");
+// app.MapHub<ChatHub>("/chathub").RequireCors("AllowAll");;
 
 app.UseAuthentication();
 app.UseMiddleware<BlockedUserMiddleware>();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        Console.WriteLine("CORS headers:");
+        foreach (var h in context.Response.Headers)
+            Console.WriteLine($"{h.Key}: {h.Value}");
+        return Task.CompletedTask;
+    });
+    await next();
+});
+app.MapHub<ChatHub>("/chathub").RequireCors("SignalRPolicy");
 
 // app.UseHttpMetrics(); Prometheus
 app.MapControllers();

@@ -25,6 +25,7 @@ namespace AzerIsiq.Data
         public DbSet<Territory> Territories { get; set; }
         public DbSet<Street> Streets { get; set; }
         public DbSet<ElectronicAppeal> ElectronicAppeals { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -167,6 +168,18 @@ namespace AzerIsiq.Data
             modelBuilder.Entity<Subscriber>()
                 .Property(s => s.Debt)
                 .HasPrecision(18, 2);
+            
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany(u => u.SentMessages)
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany(u => u.ReceivedMessages)
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

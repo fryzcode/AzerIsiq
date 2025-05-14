@@ -1,4 +1,5 @@
 using AzerIsiq.Dtos;
+using AzerIsiq.Models;
 
 namespace AzerIsiq.Services.ILogic;
 
@@ -9,4 +10,5 @@ public interface IUserService
     Task BlockUserAsync(int userId, bool isBlocked);
     Task<List<RoleDto>> GetAllRolesAsync();
     Task AssignRolesToUserAsync(AssignRoleDto dto);
+    Task<List<User>> GetAllUsersExceptAsync(int currentUserId);
 }

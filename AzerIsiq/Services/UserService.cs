@@ -89,4 +89,14 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<List<User>> GetAllUsersExceptAsync(int currentUserId)
+    {
+        var allUsers = await _userRepository.GetAllAsync();
+        return allUsers.Where(u => u.Id != currentUserId).ToList();
+    }
+    
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _userRepository.GetByIdAsync(id);
+    }
 }

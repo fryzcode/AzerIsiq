@@ -35,18 +35,18 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
     
-    // [Authorize]
-    // [HttpGet("me")]
-    // public async Task<IActionResult> GetMyProfile()
-    // {
-    //     var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-    //
-    //     var user = await _userService.GetUserByIdAsync(currentUserId);
-    //     if (user == null)
-    //         return NotFound();
-    //
-    //     return Ok(user);
-    // }
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+    
+        var user = await _userService.GetUserByIdAsync(currentUserId);
+        if (user == null)
+            return NotFound();
+    
+        return Ok(user);
+    }
     
     [Authorize(Roles = "Admin")]
     [HttpPost("block")]

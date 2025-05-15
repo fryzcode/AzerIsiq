@@ -10,4 +10,7 @@ public interface IChatService
     Task MarkMessageAsReadAsync(int messageId);
     // Task<List<Message>> GetMessagesBetweenUsersAsync(string senderUserName, string recipientUserId);
     Task<List<Message>> GetMessagesBetweenUsersAsync(int senderId, int recipientId);
+    Task MarkMessagesAsReadAsync(int readerId, int senderId);
+    Task<int> GetUnreadMessageCountAsync(int userId);
+    Task<int> GetUnreadMessageCountFromUserAsync(int currentUserId, int fromUserId);
 }

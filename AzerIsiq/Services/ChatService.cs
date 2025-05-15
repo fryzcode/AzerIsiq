@@ -70,8 +70,22 @@ public class ChatService : IChatService
         return await _chatRepository.GetMessagesForGroupAsync(groupName);
     }
 
+    public async Task MarkMessagesAsReadAsync(int readerId, int senderId)
+    {
+        await _chatRepository.MarkMessagesAsReadAsync(readerId, senderId);
+    }
     public async Task MarkMessageAsReadAsync(int messageId)
     {
         await _chatRepository.MarkAsReadAsync(messageId);
+    }
+    
+    public Task<int> GetUnreadMessageCountAsync(int userId)
+    {
+        return _chatRepository.GetUnreadMessageCountAsync(userId);
+    }
+
+    public Task<int> GetUnreadMessageCountFromUserAsync(int currentUserId, int fromUserId)
+    {
+        return _chatRepository.GetUnreadMessageCountFromUserAsync(currentUserId, fromUserId);
     }
 }

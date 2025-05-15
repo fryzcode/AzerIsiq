@@ -48,4 +48,31 @@ public class ChatRepository : IChatRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task MarkMessagesAsReadAsync(int readerId, int senderId)
+    {
+        var messages = await _context.Messages
+            .Where(m => m.SenderId == senderId && m.ReceiverId == readerId && !m.IsRead)
+            .ToListAsync();
+
+        foreach (var message in messages)
+        {
+            message.IsRead = true;
+        }
+
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task<int> GetUnreadMessageCountAsync(int userId)
+    {
+        return await _context.Messages
+            .Where(m => m.ReceiverId == userId && !m.IsRead)
+            .CountAsync();
+    }
+
+    public async Task<int> GetUnreadMessageCountFromUserAsync(int currentUserId, int fromUserId)
+    {
+        return await _context.Messages
+            .Where(m => m.ReceiverId == currentUserId && m.SenderId == fromUserId && !m.IsRead)
+            .CountAsync();
+    }
 }

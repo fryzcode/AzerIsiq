@@ -13,9 +13,9 @@ using System.Text;
 using AzerIsiq.Dtos;
 using AzerIsiq.Extensions.BackgroundTasks;
 using AzerIsiq.Extensions.DbInit;
-using AzerIsiq.Extensions.Hubs.CustomProvider;
 using AzerIsiq.Extensions.Mapping;
 using AzerIsiq.Extensions.Repository;
+using AzerIsiq.Hubs.CustomProvider;
 using AzerIsiq.Models;
 using AzerIsiq.Services.Helpers;
 using AzerIsiq.Services.ILogic;
@@ -110,6 +110,8 @@ namespace AzerIsiq.Extensions
                             "http://127.0.0.1:5500",
                             "http://localhost:3000",
                             "http://127.0.0.1:3000",
+                            "http://192.168.56.1:3000",
+                            "http://192.168.1.18:3000",
                             // "http://localhost:5500",
                             "http://192.168.137.19:3000",
                             "https://192.168.137.19:3000"
@@ -122,89 +124,6 @@ namespace AzerIsiq.Extensions
 
             return services;
         }
-
-
-        // public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
-        // {
-        //     services.AddCors(options =>
-        //     {
-        //         options.AddPolicy("OpenPolicy", policy =>
-        //         {
-        //             policy.AllowAnyOrigin()
-        //                 .AllowAnyMethod()
-        //                 .AllowAnyHeader();
-        //             
-        //         });
-        //
-        //         options.AddPolicy("SignalRPolicy", policy =>
-        //         {
-        //             policy.WithOrigins(
-        //                     "http://127.0.0.1:5500",
-        //                     "http://127.0.0.1:3000",
-        //                     "http://192.168.137.19:3000",
-        //                     "https://192.168.137.19:3000",
-        //                     "http://192.168.137.19:3000/chat"
-        //                 )
-        //                 .AllowAnyMethod()
-        //                 .AllowAnyHeader()
-        //                 .AllowCredentials();
-        //         });
-        //     });
-        //
-        //     return services;
-        // }
-
-        // public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
-        // {
-        //
-        //     // services.AddCors(options =>
-        //     // {
-        //     //     options.AddPolicy("AllowAll", policy =>
-        //     //     {
-        //     //         policy.AllowAnyOrigin()
-        //     //             .AllowAnyMethod()
-        //     //             .AllowAnyHeader();
-        //     //     });
-        //     // });
-        //     
-        //     // services.AddCors(options =>
-        //     // {
-        //     //     options.AddPolicy("AllowAll", policy =>
-        //     //     {
-        //     //         policy.WithOrigins(
-        //     //                 "http://127.0.0.1:5500",
-        //     //                 "http://192.168.137.19:3000"
-        //     //             )
-        //     //             .AllowAnyMethod()
-        //     //             .AllowAnyHeader()
-        //     //             .AllowCredentials();
-        //     //     });
-        //     // });
-        //     //
-        //     // services.AddCors(options =>
-        //     // {
-        //     //     options.AddPolicy("AllowAll", policy =>
-        //     //     {
-        //     //         policy.WithOrigins("http://127.0.0.1:5500")
-        //     //             .AllowAnyMethod()
-        //     //             .AllowAnyHeader()
-        //     //             .AllowCredentials();
-        //     //     });
-        //     // });
-        //     //
-        //     // services.AddCors(options =>
-        //     // {
-        //     //     options.AddPolicy("AllowAll", policy =>
-        //     //     {
-        //     //         policy.WithOrigins("http://192.168.137.19:3000")
-        //     //             .AllowAnyMethod()
-        //     //             .AllowAnyHeader()
-        //     //             .AllowCredentials();
-        //     //     });
-        //     // });
-        //
-        //     return services;
-        // }
 
         public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {

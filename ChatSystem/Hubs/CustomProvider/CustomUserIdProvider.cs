@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AzerIsiq.Hubs.CustomProvider;
+namespace ChatSystem.Hubs.CustomProvider;
 
 public class CustomUserIdProvider : IUserIdProvider
 {

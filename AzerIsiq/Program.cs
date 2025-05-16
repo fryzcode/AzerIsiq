@@ -5,13 +5,18 @@ using AzerIsiq.Extensions.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
+{
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+});
+
 builder.Services
     .AddCorsPolicy()
     .AddDatabaseConfiguration(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration)
     .AddApplicationServices();
 
-builder.Services.AddSignalR();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

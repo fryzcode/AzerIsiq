@@ -18,10 +18,25 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+        
+        
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Admin123@
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
   sqlserver-data:
     driver: local
+  pgdata:
 
 networks:
   azerisiq_default:

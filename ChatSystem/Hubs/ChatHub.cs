@@ -1,9 +1,10 @@
-using System.Security.Claims;
 using System.Collections.Concurrent;
+using System.Security.Claims;
 using AzerIsiq.Data;
-using Microsoft.AspNetCore.SignalR;
 using AzerIsiq.Services.ILogic;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+
+namespace ChatSystem.Hubs;
 
 public class ChatHub : Hub
 {

@@ -2,21 +2,22 @@ using System.Collections.Concurrent;
 using System.Security.Claims;
 using AzerIsiq.Data;
 using AzerIsiq.Services.ILogic;
+using ChatSystem.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatSystem.Hubs;
 
 public class ChatHub : Hub
 {
-    private readonly IChatService _chatService;
+    private readonly IMessageService _messageService;
     private readonly IUserService _userService;
     private readonly ILogger<ChatHub> _logger;
 
     private static readonly ConcurrentDictionary<int, ConcurrentHashSet<string>> _onlineUsers = new();
 
-    public ChatHub(IChatService chatService, IUserService userService, ILogger<ChatHub> logger)
+    public ChatHub(IMessageService messageService, IUserService userService, ILogger<ChatHub> logger)
     {
-        _chatService = chatService;
+        _messageService = messageService;
         _userService = userService;
         _logger = logger;
     }
@@ -74,7 +75,7 @@ public class ChatHub : Hub
         {
             _logger.LogInformation("📨 SendMessage: {SenderId} -> {RecipientId}: {Message}", senderId, recipientUserId, message);
 
-            await _chatService.SaveMessageAsync(senderId.Value, recipientUserId, message);
+            await _messageService.SaveMessageAsync(senderId.Value, recipientUserId, message);
 
             var messageDto = new
             {
@@ -104,8 +105,8 @@ public class ChatHub : Hub
 
         try
         {
-            var messages = await _chatService.GetMessagesBetweenUsersAsync(senderId.Value, recipientUserId);
-            await _chatService.MarkMessagesAsReadAsync(senderId.Value, recipientUserId);
+            var messages = await _messageService.GetMessagesBetweenUsersAsync(senderId.Value, recipientUserId);
+            await _messageService.MarkMessagesAsReadAsync(senderId.Value, recipientUserId);
             await Clients.Caller.SendAsync("LoadMessages", messages);
         }
         catch (Exception ex)
@@ -136,7 +137,7 @@ public class ChatHub : Hub
 
             foreach (var user in users)
             {
-                var count = await _chatService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, user.Id);
+                var count = await _messageService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, user.Id);
                 result[user.Id] = count;
             }
 
@@ -154,7 +155,7 @@ public class ChatHub : Hub
         var currentUserId = GetCurrentUserId();
         if (currentUserId == null) return 0;
 
-        return await _chatService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, fromUserId);
+        return await _messageService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, fromUserId);
     }
 
     public async Task<int> GetTotalUnreadCount()
@@ -162,7 +163,7 @@ public class ChatHub : Hub
         var currentUserId = GetCurrentUserId();
         if (currentUserId == null) return 0;
 
-        return await _chatService.GetUnreadMessageCountAsync(currentUserId.Value);
+        return await _messageService.GetUnreadMessageCountAsync(currentUserId.Value);
     }
 
     public async Task JoinGroup(string groupName)
@@ -183,7 +184,7 @@ public class ChatHub : Hub
 
     public async Task MarkAsRead(int messageId)
     {
-        await _chatService.MarkMessageAsReadAsync(messageId);
+        await _messageService.MarkMessageAsReadAsync(messageId);
     }
     
     private int? GetCurrentUserId()

@@ -75,6 +75,7 @@ app.Use(async (context, next) =>
 });
 app.MapHub<ChatHub>("/chathub").RequireCors("SignalRPolicy");
 
+
 // app.UseHttpMetrics(); Prometheus
 app.MapControllers();
 // app.MapMetrics();     Prometheus

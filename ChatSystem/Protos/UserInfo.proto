@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option csharp_namespace = "Azerisiq.Grpc";
+
+message GetUserByIdRequest {
+  int32 id = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetAllUsersExceptRequest {
+  int32 currentUserId = 1;
+}
+
+message UserMessage {
+  int32 id = 1;
+  string fullName = 2;
+  string email = 3;
+  bool isBlocked = 4;
+}
+
+message UserListResponse {
+  repeated UserMessage users = 1;
+}
+
+service UserGrpcService {
+  rpc GetUserById (GetUserByIdRequest) returns (UserMessage);
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (UserMessage);
+  rpc GetAllUsersExcept (GetAllUsersExceptRequest) returns (UserListResponse);
+}

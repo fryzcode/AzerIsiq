@@ -1,29 +1,36 @@
 using System.Collections.Concurrent;
 using System.Security.Claims;
-using AzerIsiq.Data;
-using AzerIsiq.Services.ILogic;
+using ChatSystem.Data;
 using ChatSystem.Services;
+using GrpcService.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatSystem.Hubs;
 
 public class ChatHub : Hub
 {
-    private readonly IMessageService _messageService;
-    private readonly IUserService _userService;
+    private readonly IMessageService _chatService;
+    private readonly UserGrpcClientService _userService;
     private readonly ILogger<ChatHub> _logger;
 
     private static readonly ConcurrentDictionary<int, ConcurrentHashSet<string>> _onlineUsers = new();
 
-    public ChatHub(IMessageService messageService, IUserService userService, ILogger<ChatHub> logger)
+    public ChatHub(IMessageService chatService, UserGrpcClientService userService, ILogger<ChatHub> logger)
     {
-        _messageService = messageService;
+        _chatService = chatService;
         _userService = userService;
         _logger = logger;
     }
 
     public override async Task OnConnectedAsync()
     {
+        Console.WriteLine("Context.User is NOT null ✅");
+
+        foreach (var claim in Context.User.Claims)
+        {
+            Console.WriteLine($"CLAIM: {claim.Type} = {claim.Value}");
+        }
+
         var userId = GetCurrentUserId();
         if (userId == null) return;
 
@@ -75,7 +82,7 @@ public class ChatHub : Hub
         {
             _logger.LogInformation("📨 SendMessage: {SenderId} -> {RecipientId}: {Message}", senderId, recipientUserId, message);
 
-            await _messageService.SaveMessageAsync(senderId.Value, recipientUserId, message);
+            await _chatService.SaveMessageAsync(senderId.Value, recipientUserId, message);
 
             var messageDto = new
             {
@@ -105,8 +112,8 @@ public class ChatHub : Hub
 
         try
         {
-            var messages = await _messageService.GetMessagesBetweenUsersAsync(senderId.Value, recipientUserId);
-            await _messageService.MarkMessagesAsReadAsync(senderId.Value, recipientUserId);
+            var messages = await _chatService.GetMessagesBetweenUsersAsync(senderId.Value, recipientUserId);
+            await _chatService.MarkMessagesAsReadAsync(senderId.Value, recipientUserId);
             await Clients.Caller.SendAsync("LoadMessages", messages);
         }
         catch (Exception ex)
@@ -119,28 +126,30 @@ public class ChatHub : Hub
     public async Task<List<ChatUserDto>> GetAllUsersExceptMe()
     {
         var currentUserId = GetCurrentUserId();
+        // var currentUserId = 1017;
         if (currentUserId == null) return new List<ChatUserDto>();
-
+        
+        // var users = await _userService.GetAllUsersExceptAsync(currentUserId);
         var users = await _userService.GetAllUsersExceptAsync(currentUserId.Value);
-        return users.Select(u => new ChatUserDto { Id = u.Id, UserName = u.UserName }).ToList();
+        return users.Select(u => new ChatUserDto { Id = u.Id, UserName = u.FullName }).ToList();
     }
 
     public async Task<Dictionary<int, int>> GetUnreadCountsForAllUsers()
     {
         var currentUserId = GetCurrentUserId();
         if (currentUserId == null) return new Dictionary<int, int>();
-
+    
         try
         {
             var users = await _userService.GetAllUsersExceptAsync(currentUserId.Value);
             var result = new Dictionary<int, int>();
-
+    
             foreach (var user in users)
             {
-                var count = await _messageService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, user.Id);
+                var count = await _chatService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, user.Id);
                 result[user.Id] = count;
             }
-
+    
             return result;
         }
         catch (Exception ex)
@@ -155,7 +164,7 @@ public class ChatHub : Hub
         var currentUserId = GetCurrentUserId();
         if (currentUserId == null) return 0;
 
-        return await _messageService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, fromUserId);
+        return await _chatService.GetUnreadMessageCountFromUserAsync(currentUserId.Value, fromUserId);
     }
 
     public async Task<int> GetTotalUnreadCount()
@@ -163,7 +172,7 @@ public class ChatHub : Hub
         var currentUserId = GetCurrentUserId();
         if (currentUserId == null) return 0;
 
-        return await _messageService.GetUnreadMessageCountAsync(currentUserId.Value);
+        return await _chatService.GetUnreadMessageCountAsync(currentUserId.Value);
     }
 
     public async Task JoinGroup(string groupName)
@@ -184,12 +193,31 @@ public class ChatHub : Hub
 
     public async Task MarkAsRead(int messageId)
     {
-        await _messageService.MarkMessageAsReadAsync(messageId);
+        await _chatService.MarkMessageAsReadAsync(messageId);
     }
+    
+    // private int? GetCurrentUserId()
+    // {
+    //     var userIdStr = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    //     Console.WriteLine(userIdStr);
+    //     return int.TryParse(userIdStr, out var userId) ? userId : (int?)null;
+    // }
     
     private int? GetCurrentUserId()
     {
-        var userIdStr = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine("IsAuthenticated: " + Context.User?.Identity?.IsAuthenticated);
+        Console.WriteLine("All Claims:");
+        foreach (var claim in Context.User?.Claims ?? Enumerable.Empty<Claim>())
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+        var userIdStr =
+            Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+            Context.User?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+        Console.WriteLine("Context.User" + Context.User);
+        Console.WriteLine("UserIdStr: " + userIdStr);
+
         return int.TryParse(userIdStr, out var userId) ? userId : (int?)null;
     }
 }

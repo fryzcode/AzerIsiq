@@ -1,57 +1,32 @@
-using AzerIsiq.Repository.Interface;
-using AzerIsiq.Repository.Services;
-using AzerIsiq.Services;
-using AzerIsiq.Services.ILogic;
-using ChatSystem.Abstraction;
-using ChatSystem.Data;
-using ChatSystem.Services;
-using Microsoft.EntityFrameworkCore;
+using ChatSystem;
+using ChatSystem.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
-{
-    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
-    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
-});
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Add services to the container.
-
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-// builder.Services.AddScoped<IUserRepository, UserRepository>();
-// builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMessageService, MessageService>();
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// builder.Services.AddGrpcClient<UserGrpc.UserGrpcClient>(o =>
-// {
-//     o.Address = new Uri("https://localhost:5297");
-// });
-//
-// builder.Services.AddScoped<GrpcRemoteUserService>();
+builder.Services.AddCorsPolicies(); // ✅ Подключение CORS
+builder.Services.AddApplicationServices(builder.Configuration); // ✅ Подключение остальных сервисов
 
 var app = builder.Build();
 
-app.MapHub<ChatHub>("/chathub");
-    
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseRouting();
 
-app.UseHttpsRedirection();
+app.UseCors(); // Или app.UseCors("SignalRPolicy"); если нужна конкретная политика
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        Console.WriteLine("CORS headers:");
+        foreach (var h in context.Response.Headers)
+            Console.WriteLine($"{h.Key}: {h.Value}");
+        return Task.CompletedTask;
+    });
+    await next();
+});
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chathub").RequireCors("SignalRPolicy");
 
 app.Run();

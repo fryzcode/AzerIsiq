@@ -3,14 +3,25 @@ using ChatSystem.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCorsPolicies(); // ✅ Подключение CORS
-builder.Services.AddApplicationServices(builder.Configuration); // ✅ Подключение остальных сервисов
+builder.Services.AddCorsPolicies(); 
+builder.Services.AddApplicationServices(builder.Configuration);
+
+var kestrelPort = builder.Configuration.GetValue<int>("Kestrel:EndpointPort");
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(kestrelPort);
+});
+
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"DBConnection: {builder.Configuration.GetConnectionString("DefaultConnection")}");
+Console.WriteLine($"Kestrel Port: {kestrelPort}");
 
 var app = builder.Build();
 
 app.UseRouting();
 
-app.UseCors(); // Или app.UseCors("SignalRPolicy"); если нужна конкретная политика
+app.UseCors(); 
 
 app.UseAuthentication();
 app.UseAuthorization();

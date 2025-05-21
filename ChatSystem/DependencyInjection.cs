@@ -18,7 +18,7 @@ namespace ChatSystem
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(config.GetConnectionString("DefaultConnection1")));
 
             services.AddJwtAuthentication(config);
 

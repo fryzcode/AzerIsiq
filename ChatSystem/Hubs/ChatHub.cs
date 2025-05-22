@@ -196,13 +196,6 @@ public class ChatHub : Hub
         await _chatService.MarkMessageAsReadAsync(messageId);
     }
     
-    // private int? GetCurrentUserId()
-    // {
-    //     var userIdStr = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    //     Console.WriteLine(userIdStr);
-    //     return int.TryParse(userIdStr, out var userId) ? userId : (int?)null;
-    // }
-    
     private int? GetCurrentUserId()
     {
         Console.WriteLine("IsAuthenticated: " + Context.User?.Identity?.IsAuthenticated);

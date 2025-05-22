@@ -2,6 +2,8 @@ using AzerIsiq.Extensions;
 using AzerIsiq.Extensions.DbInit;
 using AzerIsiq.Extensions.Exceptions;
 using AzerIsiq.Extensions.Middlewares;
+using AzerIsiq.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +14,7 @@ builder.Services.AddSignalR().AddHubOptions<ChatHub>(options =>
 });
 
 builder.Services
-    .AddCorsPolicy()
+    // .AddCorsPolicy()
     .AddDatabaseConfiguration(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration)
     .AddApplicationServices();
@@ -22,20 +24,59 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
+builder.Services.AddGrpc();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var kestrelPort = builder.Configuration.GetValue<int>("Kestrel:EndpointPort");
+var kestrelApi = builder.Configuration.GetValue<int>("Kestrel-API:EndpointPort");
+var kestrelGrpc = builder.Configuration.GetValue<int>("Kestrel-GRPC:EndpointPort");
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(kestrelPort);
+    var env = builder.Environment.EnvironmentName;
+
+    if (env == "Development")
+    {
+        // Local
+        options.ListenLocalhost(kestrelApi, listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http1;
+        });
+
+        options.ListenLocalhost(kestrelGrpc, listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http2;
+        });
+    }
+    else
+    {
+        // Production (Docker)
+        options.ListenAnyIP(kestrelApi, listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http1;
+        });
+
+        options.ListenAnyIP(kestrelGrpc, listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http2;
+        });
+    }
 });
+
+
+// builder.WebHost.ConfigureKestrel(options =>
+// {
+//     options.ListenAnyIP(kestrelPort, listenOptions =>
+//     {
+//         listenOptions.Protocols = HttpProtocols.Http2;
+//     });
+// });
 
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 Console.WriteLine($"DBConnection: {builder.Configuration.GetConnectionString("DBConnection")}");
-Console.WriteLine($"Kestrel Port: {kestrelPort}");
+Console.WriteLine($"Kestrel Port API: {kestrelApi}");
+Console.WriteLine($"Kestrel Port GRPC: {kestrelGrpc}");
 
 var app = builder.Build();
 
@@ -54,9 +95,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler("/error");
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors("OpenPolicy");
+// app.UseCors("OpenPolicy");
 // app.MapHub<ChatHub>("/chathub").RequireCors("AllowAll");;
 
 app.UseAuthentication();
@@ -73,8 +114,13 @@ app.Use(async (context, next) =>
     });
     await next();
 });
-app.MapHub<ChatHub>("/chathub").RequireCors("SignalRPolicy");
+// app.MapHub<ChatHub>("/chathub").RequireCors("SignalRPolicy");
 
+app.MapGrpcService<UserGrpcServiceImpl>();
+
+// app.MapGrpcService<UserGrpcService>();
+// app.MapGet("/", () => "gRPC server is running...");
+app.MapGet("/", () => "Hello from AzerIsiq gRPC!");
 
 // app.UseHttpMetrics(); Prometheus
 app.MapControllers();

@@ -1,36 +1,68 @@
 services:
-  azerisiq:
-    image: azerisiq
+#  azerisiq:
+#    image: azerisiq
+#    build:
+#      context: .
+#      dockerfile: AzerIsiq/Dockerfile
+#    container_name: azerisiq
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Production
+#      - ConnectionStrings__DefaultConnection=Server=sql;Database=AzerIsiqDB;User Id=SA;Password=MyStrongPass123;Encrypt=true;TrustServerCertificate=True
+#    ports:
+#      - "5252:5252"
+#      - "5353:5353"
+#    networks:
+#      - azerisiq_default
+        
+  chatsystem:
+    image: chatsystem
     build:
       context: .
-      dockerfile: AzerIsiq/Dockerfile
-    container_name: azerisiq
+      dockerfile: ChatSystem/Dockerfile
+    container_name: chatsystem
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=sql;Database=AzerIsiqDB;User Id=SA;Password=MyStrongPass123;Encrypt=true;TrustServerCertificate=True
+#      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=ChatDB;Username=admin;Password=Admin123@
+#    depends_on:
+#      - postgres
     ports:
-      - "5252:5252"
+      - "6464:6464"
+    networks:
+      - azerisiq_default    
+        
+  apigateway:
+    image: apigateway
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    container_name: apigateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "8585:8080"
     networks:
       - azerisiq_default
-  
-  redis:
-    image: redis
-    container_name: redis
-    ports:
-      - "6379:6379"  
         
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: Admin123@
-      POSTGRES_DB: mydatabase
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+        #  redis:
+#    image: redis
+#    container_name: redis
+#    ports:
+#      - "6379:6379"  
+  
+
+        
+#  postgres:
+#    image: postgres:15
+#    container_name: postgres
+#    restart: always
+#    environment:
+#      POSTGRES_USER: admin
+#      POSTGRES_PASSWORD: Admin123@
+#      POSTGRES_DB: mydatabase
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
 
 volumes:
   sqlserver-data:

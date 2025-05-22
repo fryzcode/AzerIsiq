@@ -82,6 +82,8 @@ namespace AzerIsiq.Extensions
             
             services.AddScoped<IElectronicAppealRepository, ElectronicAppealRepository>();
             services.AddScoped<IElectronicAppealService, ElectronicAppealService>();
+            
+            services.AddScoped<UserGrpcServiceImpl>();
 
             services.AddScoped<IChatService, ChatService>();
 
@@ -93,37 +95,41 @@ namespace AzerIsiq.Extensions
             return services;
         }
         
-        public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
-        {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("OpenPolicy", policy =>
-                {
-                    policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader();
-                });
-
-                options.AddPolicy("SignalRPolicy", policy =>
-                {
-                    policy.WithOrigins(
-                            "http://127.0.0.1:5500",
-                            "http://localhost:3000",
-                            "http://127.0.0.1:3000",
-                            "http://192.168.56.1:3000",
-                            "http://192.168.1.18:3000",
-                            // "http://localhost:5500",
-                            "http://192.168.137.19:3000",
-                            "https://192.168.137.19:3000"
-                        )
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-            });
-
-            return services;
-        }
+        // public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
+        // {
+        //     services.AddCors(options =>
+        //     {
+        //         options.AddPolicy("OpenPolicy", policy =>
+        //         {
+        //             policy.AllowAnyOrigin()
+        //                 .AllowAnyMethod()
+        //                 .AllowAnyHeader();
+        //         });
+        //
+        //         options.AddPolicy("SignalRPolicy", policy =>
+        //         {
+        //             policy.WithOrigins(
+        //                     "http://127.0.0.1:5500",
+        //                     "http://127.0.0.1:5001",
+        //                     "http://localhost:5001",
+        //                     "http://localhost:5001",
+        //                     "http://localhost:5298",
+        //                     "http://localhost:3000",
+        //                     "http://127.0.0.1:3000",
+        //                     "http://192.168.56.1:3000",
+        //                     "http://192.168.1.18:3000",
+        //                     // "http://localhost:5500",
+        //                     "http://192.168.137.19:3000",
+        //                     "https://192.168.137.19:3000"
+        //                 )
+        //                 .AllowAnyHeader()
+        //                 .AllowAnyMethod()
+        //                 .AllowCredentials();
+        //         });
+        //     });
+        //
+        //     return services;
+        // }
 
         public static IServiceCollection AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
@@ -137,6 +143,8 @@ namespace AzerIsiq.Extensions
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
             var keyString = jwtSettings["Key"];
+            Console.WriteLine($"JWT Raw Key (from config): {jwtSettings["Key"]}");
+            Console.WriteLine($"JWT Base64 Key: {Convert.ToBase64String(Encoding.UTF8.GetBytes(jwtSettings["Key"]))}");
             if (string.IsNullOrEmpty(keyString))
             {
                 throw new Exception("JWT Key is missing in configuration.");
